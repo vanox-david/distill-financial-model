@@ -21,7 +21,7 @@ initial_dev = st.sidebar.number_input('Initial Developer Customers', min_value=0
 initial_fin = st.sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
 
 dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 3.0, .75)
-dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1)
+dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.0)
 dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
 
 fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
@@ -29,7 +29,7 @@ fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1)
 fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
 
 monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
-monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1)
+monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1.0)
 
 rev_results, dev_results, fin_results, churn_results = [], [], [], []
 
