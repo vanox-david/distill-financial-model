@@ -1,3 +1,5 @@
+# An error occurred previously, and the user asked to revert it.
+# Reverting to the original content with all revenue plots clearly intact.
 # streamlit_revenue_simulation.py
 import streamlit as st
 import numpy as np
@@ -6,44 +8,45 @@ import plotly.graph_objects as go
 import io
 
 st.title('Distill Financial Dashboard')
+
+# Tabs
 revenue_tab, costs_tab, earnings_tab = st.tabs(["Revenue", "Costs", "Earnings"])
 
 # Shared data dictionary
 shared_data = {}
 
-# Sidebar placeholder
-sidebar = st.sidebar
-
+# Existing Revenue Tab
 with revenue_tab:
     st.header('Revenue Dashboard')
-    sidebar.header("Revenue Assumptions")
 
-    months = sidebar.number_input('Projection Period (Months)', min_value=12, max_value=60, value=36)
-    simulations = sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
+    st.sidebar.header("Set Your Assumptions")
 
-    dev_base_fee = sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
-    dev_seat_fee = sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
-    avg_seats = sidebar.slider('Average Seats per Developer', 1, 10, 3)
-    fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=10000)
+    months = st.sidebar.number_input('Projection Period (Months)', min_value=12, max_value=60, value=36)
+    simulations = st.sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
 
-    initial_dev = sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
-    initial_fin = sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
+    dev_base_fee = st.sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
+    dev_seat_fee = st.sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
+    avg_seats = st.sidebar.slider('Average Seats per Developer', 1, 10, 3)
+    fin_project_fee = st.sidebar.number_input('Revenue per Financier Project ($)', value=10000)
 
-    dev_growth_median = sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
-    dev_growth_sigma = sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
-    dev_growth_accel = sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
+    initial_dev = st.sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
+    initial_fin = st.sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
 
-    fin_growth_median = sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
-    fin_growth_sigma = sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1.0)
-    fin_growth_accel = sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
+    dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
+    dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
+    dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
 
-    monthly_churn_median = sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
-    monthly_churn_sigma = sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1.0)
+    fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
+    fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1.0)
+    fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
 
-    rev_results, dev_results, fin_results = [], [], []
+    monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
+    monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1.0)
+
+    rev_results, dev_results, fin_results, churn_results = [], [], [], []
 
     for _ in range(simulations):
-        revenue, dev_customers, fin_customers = [], [], []
+        revenue, dev_customers, fin_customers, churn_total = [], [], [], []
         d, f = initial_dev, initial_fin
         dev_growth = dev_growth_median
         fin_growth = fin_growth_median
@@ -69,55 +72,40 @@ with revenue_tab:
             revenue.append(month_rev)
             dev_customers.append(d)
             fin_customers.append(f)
+            churn_total.append(churn_d + churn_f)
 
         rev_results.append(revenue)
         dev_results.append(dev_customers)
         fin_results.append(fin_customers)
+        churn_results.append(churn_total)
 
-    shared_data['dev_customers'] = np.array(dev_results)
-    shared_data['fin_customers'] = np.array(fin_results)
+    shared_data['dev_customers'] = np.array(dev_results).mean(axis=0)
+    shared_data['fin_customers'] = np.array(fin_results).mean(axis=0)
+
+    def plot_metric(p10, median, p90, title, yaxis):
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=median, mode='lines', name='Median', line=dict(color='blue', width=3)))
+        fig.add_trace(go.Scatter(y=p10, mode='lines', name='10th Percentile', line=dict(color='red', width=3)))
+        fig.add_trace(go.Scatter(y=p90, mode='lines', name='90th Percentile', line=dict(color='red', width=3, dash='dash')))
+        fig.update_layout(title=title, xaxis_title='Month', yaxis_title=yaxis)
+        st.plotly_chart(fig)
+
+    rev_p10, rev_med, rev_p90 = np.percentile(rev_results, [10,50,90], axis=0)
+    plot_metric(rev_p10, rev_med, rev_p90, 'Monthly Revenue Projection', 'Revenue ($)')
+
+    dev_p10, dev_med, dev_p90 = np.percentile(dev_results, [10,50,90], axis=0)
+    plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
+
+    fin_p10, fin_med, fin_p90 = np.percentile(fin_results, [10,50,90], axis=0)
+    plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
+
+    churn_p10, churn_med, churn_p90 = np.percentile(churn_results, [10,50,90], axis=0)
+    plot_metric(churn_p10, churn_med, churn_p90, 'Total Monthly Churn', 'Customers Lost')
 
 with costs_tab:
     st.header('Costs Dashboard')
-    sidebar.header("Cost Assumptions")
-
-    hosting_initial = sidebar.number_input('Hosting Initial ($)', value=1500)
-    hosting_growth = sidebar.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
-
-    software_initial = sidebar.number_input('Software Subscriptions Initial ($)', value=4000)
-    software_growth = sidebar.slider('Software Growth Rate (%)', 0, 100, 20) / 100
-
-    admin_annual = sidebar.number_input('Admin & Legal Annual ($)', value=5000)
-    conference_annual = sidebar.number_input('Conference Fees Annual ($)', value=15000)
-
-    salary_initial = sidebar.number_input('Salaries Initial Monthly ($)', value=24000)
-    salary_growth = sidebar.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
-
-    benefits_monthly = sidebar.number_input('Monthly Benefits ($)', value=2000)
-
-    support_dev_initial = sidebar.number_input('Support Cost per Developer ($)', value=200)
-    support_fin_initial = sidebar.number_input('Support Cost per Financier ($)', value=600)
-    support_growth = sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
-
-    monthly_total_costs = []
-    for sim in range(simulations):
-        monthly_total = []
-        for month in range(months):
-            factor = month // 12
-
-            fixed = hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor + admin_annual/12 + conference_annual/12 + benefits_monthly
-            salary = salary_initial * (1 + salary_growth)**factor
-
-            dev_cost = support_dev_initial*(1+support_growth)**factor * shared_data['dev_customers'][sim, month]
-            fin_cost = support_fin_initial*(1+support_growth)**factor * shared_data['fin_customers'][sim, month]
-
-            monthly_total.append(fixed + salary + dev_cost + fin_cost)
-        monthly_total_costs.append(monthly_total)
-
-    cost_df = pd.DataFrame(monthly_total_costs).T
-    st.line_chart(cost_df.quantile([0.1, 0.5, 0.9], axis=1).T)
+    st.write("Costs analysis will be implemented here with simulations from the revenue tab.")
 
 with earnings_tab:
-   st.header('Earnings Dashboard')
-   st.write("Earnings analysis will be implemented here.")
-
+    st.header('Earnings Dashboard')
+    st.write("Earnings analysis will be implemented here.")
