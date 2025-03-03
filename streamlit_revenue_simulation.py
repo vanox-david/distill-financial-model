@@ -9,26 +9,26 @@ st.title('Distill Probabilistic Revenue Model')
 
 st.sidebar.header("Set Your Assumptions")
 
-months = st.sidebar.number_input('Projection Period (Months)', min_value=12, max_value=120, value=36)
-simulations = st.sidebar.number_input('Number of Simulations', min_value=100, max_value=10000, value=1000)
+months = st.sidebar.number_input('Projection Period (Months)', min_value=12, max_value=60, value=36)
+simulations = st.sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
 
 dev_base_fee = st.sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
 dev_seat_fee = st.sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
 avg_seats = st.sidebar.slider('Average Seats per Developer', 1, 10, 3)
 fin_project_fee = st.sidebar.number_input('Revenue per Financier Project ($)', value=10000)
 
-initial_dev = st.sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=3)
-initial_fin = st.sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=2)
+initial_dev = st.sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
+initial_fin = st.sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
 
-dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 5.0, 2.0)
+dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 5.0, 1.0)
 dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 0.5)
-dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 1.0) / 100
+dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 4.0) / 100
 
-fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, 1.5)
+fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
 fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 0.5)
-fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 1.0) / 100
+fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 3.0) / 100
 
-monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 5.0, 1.0) / 100
+monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 3.0) / 100
 monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 1.0, 0.2)
 
 rev_results, dev_results, fin_results, churn_results = [], [], [], []
