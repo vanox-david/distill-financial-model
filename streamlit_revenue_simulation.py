@@ -110,9 +110,9 @@ with revenue_tab:
 
    shared_data['months'] = months
    shared_data['simulations'] = simulations
-   shared_data['dev_customers'] = dev_med
-   shared_data['fin_customers'] = fin_med
-   shared_data['monthly_revenue'] = rev_med
+   shared_data['dev_customers'] = dev_results
+   shared_data['fin_customers'] = fin_results
+   shared_data['monthly_revenue'] = rev_results
    
    export_df = pd.DataFrame({
        'Month': np.arange(1, months + 1),
