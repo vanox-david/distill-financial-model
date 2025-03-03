@@ -135,71 +135,83 @@ with revenue_tab:
        mime="application/vnd.ms-excel"
    )
    
+# Updated Costs Dashboard
 with costs_tab:
     st.header('Costs Dashboard')
-    sidebar.header("Cost Assumptions")
+    costs_sidebar = sidebar
+    costs_sidebar.header("Cost Assumptions")
 
+    hosting_initial = costs_sidebar.number_input('Hosting Initial ($)', value=1500)
+    hosting_growth = costs_sidebar.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
 
-    st.subheader('Fixed Monthly Costs')
-    hosting_initial = sidebar.number_input('Hosting Initial ($)', value=1500)
-    hosting_growth = sidebar.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
+    software_initial = costs_sidebar.number_input('Software Subscriptions Initial ($)', value=4000)
+    software_growth = costs_sidebar.slider('Software Growth Rate (%)', 0, 100, 20) / 100
 
-    software_initial = sidebar.number_input('Software Subscriptions Initial ($)', value=4000)
-    software_growth = sidebar.slider('Software Growth Rate (%)', 0, 100, 20) / 100
+    admin_annual = costs_sidebar.number_input('Admin & Legal Annual ($)', value=5000)
+    conference_annual = costs_sidebar.number_input('Conference Fees Annual ($)', value=15000)
 
-    admin_annual = sidebar.number_input('Admin & Legal Annual ($)', value=5000)
-    conference_annual = sidebar.number_input('Conference Fees Annual ($)', value=15000)
+    salary_initial = costs_sidebar.number_input('Salaries Initial Monthly ($)', value=24000)
+    salary_growth = costs_sidebar.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
 
-    salary_initial = sidebar.number_input('Salaries Initial Monthly ($)', value=24000)
-    salary_growth = sidebar.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
+    benefits_monthly = costs_sidebar.number_input('Monthly Benefits ($)', value=2000)
 
-    benefits_monthly = sidebar.number_input('Monthly Benefits ($)', value=2000)
+    support_dev_initial = costs_sidebar.number_input('Support Cost per Developer ($)', value=200)
+    support_fin_initial = costs_sidebar.number_input('Support Cost per Financier ($)', value=600)
+    support_growth = costs_sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
 
-    st.subheader('Variable Costs per Customer')
-    support_dev_initial = sidebar.number_input('Support Cost per Developer ($)', value=200)
-    support_fin_initial = sidebar.number_input('Support Cost per Financier ($)', value=600)
-    support_growth = sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
+    compute_initial = costs_sidebar.number_input('Compute Initial ($)', value=500)
+    compute_growth = costs_sidebar.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
 
-    compute_initial = sidebar.number_input('Compute Initial ($)', value=500)
-    compute_growth = sidebar.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
+    api_initial = costs_sidebar.number_input('API Initial ($)', value=200)
+    api_growth = costs_sidebar.slider('API Growth Rate (%)', 0, 100, 50) / 100
 
-    api_initial = sidebar.number_input('API Initial ($)', value=200)
-    api_growth = sidebar.slider('API Growth Rate (%)', 0, 100, 50) / 100
+    total_costs, fixed_costs, variable_costs, dev_costs, fin_costs, salary_costs = [], [], [], [], [], []
 
-    # Cost calculations
-    monthly_fixed, monthly_variable, fin_costs, dev_costs, salary_costs, total_costs = [], [], [], [], [], []
+    for sim in range(simulations):
+        sim_total, sim_fixed, sim_variable, sim_dev, sim_fin, sim_salary = [], [], [], [], [], []
 
-    for month in range(months):
-        factor = month // 12
+        for month in range(months):
+            factor = month // 12
 
-        fixed = (hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor +
-                 admin_annual/12 + conference_annual/12 + benefits_monthly)
-        salary = salary_initial * (1 + salary_growth)**factor
-        variable = (compute_initial*(1+compute_growth)**factor + api_initial*(1+api_growth)**factor)
-        dev_cost = support_dev_initial*(1+support_growth)**factor * shared_data['dev_customers'][month]
-        fin_cost = support_fin_initial*(1+support_growth)**factor * shared_data['fin_customers'][month]
+            fixed = (hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor +
+                     admin_annual/12 + conference_annual/12 + benefits_monthly)
+            salary = salary_initial * (1 + salary_growth)**factor
+            compute = compute_initial * (1 + compute_growth)**factor
+            api = api_initial * (1 + api_growth)**factor
 
-        total = fixed + salary + variable + dev_cost + fin_cost
+            dev_cost = support_dev_initial*(1+support_growth)**factor * shared_data['dev_customers'][sim, month]
+            fin_cost = support_fin_initial*(1+support_growth)**factor * shared_data['fin_customers'][sim, month]
 
-        monthly_fixed.append(fixed)
-        monthly_variable.append(variable + dev_cost + fin_cost)
-        dev_costs.append(dev_cost)
-        fin_costs.append(fin_cost)
-        salary_costs.append(salary)
-        total_costs.append(total)
+            variable = compute + api + dev_cost + fin_cost
 
-    # Plot total and breakdown
-    cost_df = pd.DataFrame({
-        'Total Cost': total_costs,
-        'Fixed Cost': monthly_fixed,
-        'Variable Cost': monthly_variable,
-        'Dev Customer Cost': dev_costs,
-        'Fin Customer Cost': fin_costs,
-        'Salary Cost': salary_costs
-    })
+            total = fixed + salary + variable
 
-    fig_costs = go.Figure()
-    fig_costs.add_trace(go.Scatter(y=monthly_costs, mode='lines', name='Total Monthly Costs', line=dict(color='purple', width=3)))
-    fig_costs.update_layout(title='Monthly Cost Projection', xaxis_title='Month', yaxis_title='Costs ($)')
-    st.plotly_chart(fig_costs)
-   
+            sim_total.append(total)
+            sim_fixed.append(fixed)
+            sim_variable.append(variable)
+            sim_dev.append(dev_cost)
+            sim_fin.append(fin_cost)
+            sim_salary.append(salary)
+
+        total_costs.append(sim_total)
+        fixed_costs.append(sim_fixed)
+        variable_costs.append(sim_variable)
+        dev_costs.append(sim_dev)
+        fin_costs.append(sim_fin)
+        salary_costs.append(sim_salary)
+
+    def plot_costs(data, title):
+        p10, med, p90 = np.percentile(data, [10, 50, 90], axis=0)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=med, name='Median', line=dict(color='blue', width=3)))
+        fig.add_trace(go.Scatter(y=p10, name='10th Percentile', line=dict(color='red', width=2, dash='dot')))
+        fig.add_trace(go.Scatter(y=p90, name='90th Percentile', line=dict(color='red', width=2, dash='dot')))
+        fig.update_layout(title=title, xaxis_title='Month', yaxis_title='Cost ($)')
+        st.plotly_chart(fig)
+
+    plot_costs(total_costs, 'Total Monthly Costs')
+    plot_costs(fixed_costs, 'Fixed Monthly Costs')
+    plot_costs(variable_costs, 'Variable Monthly Costs')
+    plot_costs(dev_costs, 'Developer Customer Costs')
+    plot_costs(fin_costs, 'Financial Customer Costs')
+    plot_costs(salary_costs, 'Salary Costs')
