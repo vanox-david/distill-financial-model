@@ -201,6 +201,5 @@ with costs_tab:
     fig_costs = go.Figure()
     fig_costs.add_trace(go.Scatter(y=monthly_costs, mode='lines', name='Total Monthly Costs', line=dict(color='purple', width=3)))
     fig_costs.update_layout(title='Monthly Cost Projection', xaxis_title='Month', yaxis_title='Costs ($)')
-    st.plotly_chart(fig_costs)with earnings_tab:
-    st.header('Earnings Dashboard')
-    st.write("Earnings analysis will be implemented here.")
+    st.plotly_chart(fig_costs)
+   
