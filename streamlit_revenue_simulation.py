@@ -222,7 +222,7 @@ with costs_tab:
 with earnings_tab:
     st.header('Earnings Dashboard')
 
-    revenue_simulations = np.array(shared_data['revenue'])
+    revenue_simulations = np.array(shared_data['monthly_revenue'])
     cost_simulations = np.array(total_costs)
 
     earnings_simulations = revenue_simulations - cost_simulations
