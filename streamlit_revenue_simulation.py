@@ -217,3 +217,31 @@ with costs_tab:
     plot_costs(dev_costs, 'Developer Customer Costs')
     plot_costs(fin_costs, 'Financial Customer Costs')
     plot_costs(salary_costs, 'Salary Costs')
+
+# Updated Earnings Dashboard
+with earnings_tab:
+    st.header('Earnings Dashboard')
+
+    revenue_simulations = np.array(shared_data['revenue'])
+    cost_simulations = np.array(total_costs)
+
+    earnings_simulations = revenue_simulations - cost_simulations
+    cumulative_earnings = np.cumsum(earnings_simulations, axis=1)
+
+    def plot_earnings(data, title):
+        p10, med, p90 = np.percentile(data, [10, 50, 90], axis=0)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=med, name='Median', line=dict(color='blue', width=3)))
+        fig.add_trace(go.Scatter(y=p10, name='10th Percentile', line=dict(color='red', width=2, dash='dot')))
+        fig.add_trace(go.Scatter(y=p90, name='90th Percentile', line=dict(color='red', width=2, dash='dot')))
+        fig.update_layout(title=title, xaxis_title='Month', yaxis_title='Earnings ($)')
+        st.plotly_chart(fig)
+
+    plot_earnings(earnings_simulations, 'Monthly Earnings')
+    plot_earnings(cumulative_earnings, 'Cumulative Earnings')
+
+    break_even_months = [np.argmax(cum > 0) if np.any(cum > 0) else months for cum in cumulative_earnings]
+    median_break_even = np.median(break_even_months)
+
+    st.metric(label="Median Break-even Month", value=int(median_break_even))
+
