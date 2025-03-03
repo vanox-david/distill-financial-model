@@ -83,18 +83,27 @@ with revenue_tab:
    fin_p10, fin_med, fin_p90 = get_quantiles(fin_results)
    churn_p10, churn_med, churn_p90 = get_quantiles(churn_results)
 
-   def plot_metric(p10, median, p90, title, yaxis):
-       fig = go.Figure()
-       fig.add_trace(go.Scatter(y=median, mode='lines', name='Median', line=dict(color='blue', width=3)))
-       fig.add_trace(go.Scatter(y=p10, mode='lines', name='10th Percentile', line=dict(color='red', width=3)))
-       fig.add_trace(go.Scatter(y=p90, mode='lines', name='90th Percentile', line=dict(color='red', width=3, dash='dash')))
-       fig.update_layout(title=title, xaxis_title='Month', yaxis_title=yaxis)
-       st.plotly_chart(fig)
+    fig = go.Figure()
+    for sim in rev_results:
+        fig.add_trace(go.Scatter(y=sim, mode='lines', line=dict(color='lightgrey'), opacity=0.1, showlegend=False))
+    fig.add_trace(go.Scatter(y=rev_med, mode='lines', name='Median', line=dict(color='blue', width=3)))
+    fig.add_trace(go.Scatter(y=rev_p10, mode='lines', name='10th Percentile', line=dict(color='red', width=3)))
+    fig.add_trace(go.Scatter(y=rev_p90, mode='lines', name='90th Percentile', line=dict(color='red', width=3, dash='dash')))
+    fig.update_layout(title='Monthly Revenue Projection', xaxis_title='Month', yaxis_title='Revenue ($)')
+    st.plotly_chart(fig)
 
-   plot_metric(rev_p10, rev_med, rev_p90, 'Monthly Revenue Projection', 'Revenue ($)')
-   plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
-   plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
-   plot_metric(churn_p10, churn_med, churn_p90, 'Total Monthly Churn', 'Customers Lost')
+    def plot_metric(p10, median, p90, title, yaxis):
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=median, mode='lines', name='Median', line=dict(color='blue', width=3)))
+        fig.add_trace(go.Scatter(y=p10, mode='lines', name='10th Percentile', line=dict(color='red', width=3)))
+        fig.add_trace(go.Scatter(y=p90, mode='lines', name='90th Percentile', line=dict(color='red', width=3, dash='dash')))
+        fig.update_layout(title=title, xaxis_title='Month', yaxis_title=yaxis)
+        st.plotly_chart(fig)
+
+    plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
+    plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
+    plot_metric(churn_p10, churn_med, churn_p90, 'Total Monthly Churn', 'Customers Lost')
+
 
    shared_data['months'] = months
    shared_data['simulations'] = simulations
