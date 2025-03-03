@@ -25,7 +25,7 @@ dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.
 dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
 
 fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
-fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1)
+fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1.0)
 fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
 
 monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
