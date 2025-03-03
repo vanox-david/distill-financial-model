@@ -93,6 +93,11 @@ fig.add_trace(go.Scatter(y=rev_p90, mode='lines', name='90th Percentile', line=d
 fig.update_layout(title='Monthly Revenue Projection', xaxis_title='Month', yaxis_title='Revenue ($)')
 st.plotly_chart(fig)
 
+plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
+plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
+plot_metric(churn_p10, churn_med, churn_p90, 'Total Monthly Churn', 'Customers Lost')
+
+
 export_df = pd.DataFrame({
     'Month': np.arange(1, months + 1),
     'Median Revenue': rev_med,
@@ -113,8 +118,3 @@ st.download_button(
     file_name="detailed_revenue_projections.xlsx",
     mime="application/vnd.ms-excel"
 )
-
-
-plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
-plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
-plot_metric(churn_p10, churn_med, churn_p90, 'Total Monthly Churn', 'Customers Lost')
