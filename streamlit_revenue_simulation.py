@@ -149,8 +149,8 @@ with costs_tab:
     admin_annual = costs_sidebar.number_input('Admin & Legal Annual ($)', value=5000)
     conference_annual = costs_sidebar.number_input('Conference Fees Annual ($)', value=15000)
 
-    salary_initial = costs_sidebar.number_input('Salaries Initial Monthly ($)', value=24000)
-    salary_growth = costs_sidebar.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
+    salary_initial = costs_sidebar.number_input('Salaries Initial Monthly ($)', value=48000)
+    salary_growth = costs_sidebar.slider('Salary Growth Rate (%)', 0, 200, 100) / 100
 
     benefits_monthly = costs_sidebar.number_input('Monthly Benefits ($)', value=2000)
 
