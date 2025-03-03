@@ -11,32 +11,35 @@ revenue_tab, costs_tab, earnings_tab = st.tabs(["Revenue", "Costs", "Earnings"])
 # Shared data dictionary
 shared_data = {}
 
+# Sidebar placeholder
+sidebar = st.sidebar
+
 with revenue_tab:
    st.header('Revenue Dashboard')
 
-   st.sidebar.header("Set Your Assumptions")
+   sidebar.header("Revenue Assumptions")
 
-   months = st.sidebar.number_input('Projection Period (Months)', min_value=12, max_value=60, value=36)
-   simulations = st.sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
+   months = sidebar.number_input('Projection Period (Months)', min_value=12, max_value=60, value=36)
+   simulations = sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
 
-   dev_base_fee = st.sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
-   dev_seat_fee = st.sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
-   avg_seats = st.sidebar.slider('Average Seats per Developer', 1, 10, 3)
-   fin_project_fee = st.sidebar.number_input('Revenue per Financier Project ($)', value=10000)
+   dev_base_fee = sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
+   dev_seat_fee = sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
+   avg_seats = sidebar.slider('Average Seats per Developer', 1, 10, 3)
+   fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=10000)
 
-   initial_dev = st.sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
-   initial_fin = st.sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
+   initial_dev = sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
+   initial_fin = sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
 
-   dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
-   dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
-   dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
+   dev_growth_median = sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
+   dev_growth_sigma = sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
+   dev_growth_accel = sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
 
-   fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
-   fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1.0)
-   fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
+   fin_growth_median = sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
+   fin_growth_sigma = sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1.0)
+   fin_growth_accel = sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
 
-   monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
-   monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1.0)
+   monthly_churn_median = sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
+   monthly_churn_sigma = sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1.0)
 
    rev_results, dev_results, fin_results, churn_results = [], [], [], []
 
@@ -134,32 +137,34 @@ with revenue_tab:
    
 with costs_tab:
     st.header('Costs Dashboard')
+    sidebar.header("Cost Assumptions")
+
 
     st.subheader('Fixed Monthly Costs')
-    hosting_initial = st.number_input('Hosting Initial ($)', value=1500)
-    hosting_growth = st.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
+    hosting_initial = sidebar.number_input('Hosting Initial ($)', value=1500)
+    hosting_growth = sidebar.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
 
-    software_initial = st.number_input('Software Subscriptions Initial ($)', value=4000)
-    software_growth = st.slider('Software Growth Rate (%)', 0, 100, 20) / 100
+    software_initial = sidebar.number_input('Software Subscriptions Initial ($)', value=4000)
+    software_growth = sidebar.slider('Software Growth Rate (%)', 0, 100, 20) / 100
 
-    admin_annual = st.number_input('Admin & Legal Annual ($)', value=5000)
-    conference_annual = st.number_input('Conference Fees Annual ($)', value=15000)
+    admin_annual = sidebar.number_input('Admin & Legal Annual ($)', value=5000)
+    conference_annual = sidebar.number_input('Conference Fees Annual ($)', value=15000)
 
-    salary_initial = st.number_input('Salaries Initial Monthly ($)', value=24000)
-    salary_growth = st.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
+    salary_initial = sidebar.number_input('Salaries Initial Monthly ($)', value=24000)
+    salary_growth = sidebar.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
 
-    benefits_monthly = st.number_input('Monthly Benefits ($)', value=2000)
+    benefits_monthly = sidebar.number_input('Monthly Benefits ($)', value=2000)
 
     st.subheader('Variable Costs per Customer')
-    support_dev_initial = st.number_input('Support Cost per Developer ($)', value=200)
-    support_fin_initial = st.number_input('Support Cost per Financier ($)', value=600)
-    support_growth = st.slider('Support Growth Rate (%)', 0, 100, 50) / 100
+    support_dev_initial = sidebar.number_input('Support Cost per Developer ($)', value=200)
+    support_fin_initial = sidebar.number_input('Support Cost per Financier ($)', value=600)
+    support_growth = sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
 
-    compute_initial = st.number_input('Compute Initial ($)', value=500)
-    compute_growth = st.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
+    compute_initial = sidebar.number_input('Compute Initial ($)', value=500)
+    compute_growth = sidebar.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
 
-    api_initial = st.number_input('API Initial ($)', value=200)
-    api_growth = st.slider('API Growth Rate (%)', 0, 100, 50) / 100
+    api_initial = sidebar.number_input('API Initial ($)', value=200)
+    api_growth = sidebar.slider('API Growth Rate (%)', 0, 100, 50) / 100
 
     # Cost calculations
     monthly_fixed, monthly_variable, fin_costs, dev_costs, salary_costs, total_costs = [], [], [], [], [], []
@@ -193,7 +198,9 @@ with costs_tab:
         'Salary Cost': salary_costs
     })
 
-    st.line_chart(cost_df)
-with earnings_tab:
+   fig_costs = go.Figure()
+    fig_costs.add_trace(go.Scatter(y=monthly_costs, mode='lines', name='Total Monthly Costs', line=dict(color='purple', width=3)))
+    fig_costs.update_layout(title='Monthly Cost Projection', xaxis_title='Month', yaxis_title='Costs ($)')
+    st.plotly_chart(fig_costs)with earnings_tab:
    st.header('Earnings Dashboard')
    st.write("Earnings analysis will be implemented here.")
