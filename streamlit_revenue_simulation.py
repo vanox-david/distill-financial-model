@@ -133,9 +133,67 @@ with revenue_tab:
    )
    
 with costs_tab:
-   st.header('Costs Dashboard')
-   st.write("Costs analysis will be implemented here.")
+    st.header('Costs Dashboard')
 
+    st.subheader('Fixed Monthly Costs')
+    hosting_initial = st.number_input('Hosting Initial ($)', value=1500)
+    hosting_growth = st.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
+
+    software_initial = st.number_input('Software Subscriptions Initial ($)', value=4000)
+    software_growth = st.slider('Software Growth Rate (%)', 0, 100, 20) / 100
+
+    admin_annual = st.number_input('Admin & Legal Annual ($)', value=5000)
+    conference_annual = st.number_input('Conference Fees Annual ($)', value=15000)
+
+    salary_initial = st.number_input('Salaries Initial Monthly ($)', value=24000)
+    salary_growth = st.slider('Salary Growth Rate (%)', 0, 100, 100) / 100
+
+    benefits_monthly = st.number_input('Monthly Benefits ($)', value=2000)
+
+    st.subheader('Variable Costs per Customer')
+    support_dev_initial = st.number_input('Support Cost per Developer ($)', value=200)
+    support_fin_initial = st.number_input('Support Cost per Financier ($)', value=600)
+    support_growth = st.slider('Support Growth Rate (%)', 0, 100, 50) / 100
+
+    compute_initial = st.number_input('Compute Initial ($)', value=500)
+    compute_growth = st.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
+
+    api_initial = st.number_input('API Initial ($)', value=200)
+    api_growth = st.slider('API Growth Rate (%)', 0, 100, 50) / 100
+
+    # Cost calculations
+    monthly_fixed, monthly_variable, fin_costs, dev_costs, salary_costs, total_costs = [], [], [], [], [], []
+
+    for month in range(months):
+        factor = month // 12
+
+        fixed = (hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor +
+                 admin_annual/12 + conference_annual/12 + benefits_monthly)
+        salary = salary_initial * (1 + salary_growth)**factor
+        variable = (compute_initial*(1+compute_growth)**factor + api_initial*(1+api_growth)**factor)
+        dev_cost = support_dev_initial*(1+support_growth)**factor * shared_data['dev_customers'][month]
+        fin_cost = support_fin_initial*(1+support_growth)**factor * shared_data['fin_customers'][month]
+
+        total = fixed + salary + variable + dev_cost + fin_cost
+
+        monthly_fixed.append(fixed)
+        monthly_variable.append(variable + dev_cost + fin_cost)
+        dev_costs.append(dev_cost)
+        fin_costs.append(fin_cost)
+        salary_costs.append(salary)
+        total_costs.append(total)
+
+    # Plot total and breakdown
+    cost_df = pd.DataFrame({
+        'Total Cost': total_costs,
+        'Fixed Cost': monthly_fixed,
+        'Variable Cost': monthly_variable,
+        'Dev Customer Cost': dev_costs,
+        'Fin Customer Cost': fin_costs,
+        'Salary Cost': salary_costs
+    })
+
+    st.line_chart(cost_df)
 with earnings_tab:
    st.header('Earnings Dashboard')
    st.write("Earnings analysis will be implemented here.")
