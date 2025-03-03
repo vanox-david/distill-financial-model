@@ -20,16 +20,16 @@ fin_project_fee = st.sidebar.number_input('Revenue per Financier Project ($)', v
 initial_dev = st.sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
 initial_fin = st.sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
 
-dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 5.0, 1.0)
-dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 0.5)
-dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 4.0) / 100
+dev_growth_median = st.sidebar.slider('Median Developer Adds', 0.0, 3.0, .75)
+dev_growth_sigma = st.sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1)
+dev_growth_accel = st.sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
 
 fin_growth_median = st.sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
-fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 0.5)
-fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 3.0) / 100
+fin_growth_sigma = st.sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1)
+fin_growth_accel = st.sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
 
-monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 3.0) / 100
-monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 1.0, 0.2)
+monthly_churn_median = st.sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
+monthly_churn_sigma = st.sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1)
 
 rev_results, dev_results, fin_results, churn_results = [], [], [], []
 
@@ -92,6 +92,28 @@ fig.add_trace(go.Scatter(y=rev_p10, mode='lines', name='10th Percentile', line=d
 fig.add_trace(go.Scatter(y=rev_p90, mode='lines', name='90th Percentile', line=dict(color='red', width=3, dash='dash')))
 fig.update_layout(title='Monthly Revenue Projection', xaxis_title='Month', yaxis_title='Revenue ($)')
 st.plotly_chart(fig)
+
+export_df = pd.DataFrame({
+    'Month': np.arange(1, months + 1),
+    'Median Revenue': rev_med,
+    '10th Percentile Revenue': rev_p10,
+    '90th Percentile Revenue': rev_p90,
+    'Median Developers': dev_med.astype(int),
+    'Median Financiers': fin_med.astype(int),
+    'Median Churn': churn_med.astype(int)
+})
+
+output = io.BytesIO()
+with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    export_df.to_excel(writer, sheet_name='Projections', index=False)
+
+st.download_button(
+    label="Export All Projections to Excel",
+    data=output.getvalue(),
+    file_name="detailed_revenue_projections.xlsx",
+    mime="application/vnd.ms-excel"
+)
+
 
 plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
 plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
