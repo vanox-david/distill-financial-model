@@ -134,11 +134,10 @@ with revenue_tab:
        file_name="detailed_revenue_projections.xlsx",
        mime="application/vnd.ms-excel"
    )
-   
-# Updated Costs Dashboard
+   # Updated Costs Dashboard
 with costs_tab:
     st.header('Costs Dashboard')
-    costs_sidebar = sidebar
+    costs_sidebar = st.sidebar
     costs_sidebar.header("Cost Assumptions")
 
     hosting_initial = costs_sidebar.number_input('Hosting Initial ($)', value=1500)
@@ -167,6 +166,9 @@ with costs_tab:
 
     total_costs, fixed_costs, variable_costs, dev_costs, fin_costs, salary_costs = [], [], [], [], [], []
 
+    dev_customers = np.array(shared_data['dev_customers'])
+    fin_customers = np.array(shared_data['fin_customers'])
+
     for sim in range(simulations):
         sim_total, sim_fixed, sim_variable, sim_dev, sim_fin, sim_salary = [], [], [], [], [], []
 
@@ -179,8 +181,8 @@ with costs_tab:
             compute = compute_initial * (1 + compute_growth)**factor
             api = api_initial * (1 + api_growth)**factor
 
-            dev_cost = support_dev_initial*(1+support_growth)**factor * shared_data['dev_customers'][sim, month]
-            fin_cost = support_fin_initial*(1+support_growth)**factor * shared_data['fin_customers'][sim, month]
+            dev_cost = support_dev_initial*(1+support_growth)**factor * dev_customers[sim, month]
+            fin_cost = support_fin_initial*(1+support_growth)**factor * fin_customers[sim, month]
 
             variable = compute + api + dev_cost + fin_cost
 
