@@ -27,9 +27,7 @@ with revenue_tab:
    avg_seats = sidebar.slider('Average Seats per Developer', 1, 10, 3)
    fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=10000)
 
-   initial_dev = sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
    dev_delay = sidebar.number_input('Months Delay for Developer Customers', min_value=0, max_value=months, value=9)
-   initial_fin = sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
    fin_delay = sidebar.number_input('Months Delay for Financier Customers', min_value=0, max_value=months, value=18)
 
    dev_growth_median = sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
@@ -47,7 +45,7 @@ with revenue_tab:
 
    for _ in range(simulations):
        revenue, dev_customers, fin_customers, churn_total = [], [], [], []
-       d, f = initial_dev, initial_fin
+       d, f = 0, 0
        dev_growth = dev_growth_median
        fin_growth = fin_growth_median
 
