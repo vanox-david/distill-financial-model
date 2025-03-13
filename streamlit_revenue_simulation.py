@@ -29,6 +29,7 @@ with revenue_tab:
 
    initial_dev = sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
    initial_fin = sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
+   fin_delay = sidebar.number_input('Months Delay for Financier Customers', min_value=0, max_value=months, value=9)
 
    dev_growth_median = sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
    dev_growth_sigma = 1.1#sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
@@ -50,8 +51,12 @@ with revenue_tab:
        fin_growth = fin_growth_median
 
        for m in range(months):
-           new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
-           new_fin = int(np.random.lognormal(mean=np.log(fin_growth + 1e-9), sigma=fin_growth_sigma))
+          if m >= fin_delay:
+             new_fin = int(np.random.lognormal(mean=np.log(fin_growth + 1e-9), sigma=fin_growth_sigma))
+          else:
+             new_fin = 0
+          
+          new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
            d += new_dev
            f += new_fin
 
