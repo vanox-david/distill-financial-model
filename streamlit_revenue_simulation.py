@@ -183,9 +183,10 @@ with costs_tab:
         for month in range(months):
             factor = month // 12
 
+            salary = salary_initial * (1 + salary_growth)**factor 
             fixed = (hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor +
-                     admin_annual/12 + conference_annual/12 + benefits_monthly)
-            salary = salary_initial * (1 + salary_growth)**factor
+                     admin_annual/12 + conference_annual/12 + benefits_monthly + salary)
+            
             compute = compute_initial * (1 + compute_growth)**factor
             api = api_initial * (1 + api_growth)**factor
 
@@ -194,7 +195,7 @@ with costs_tab:
 
             variable = compute + api + dev_cost + fin_cost
 
-            total = fixed + salary + variable
+            total = fixed + variable
 
             sim_total.append(total)
             sim_fixed.append(fixed)
