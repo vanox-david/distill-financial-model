@@ -51,12 +51,12 @@ with revenue_tab:
        fin_growth = fin_growth_median
 
        for m in range(months):
-          if m >= fin_delay:
-             new_fin = int(np.random.lognormal(mean=np.log(fin_growth + 1e-9), sigma=fin_growth_sigma))
-          else:
-             new_fin = 0
+           if m >= fin_delay:
+              new_fin = int(np.random.lognormal(mean=np.log(fin_growth + 1e-9), sigma=fin_growth_sigma))
+           else:
+              new_fin = 0
           
-          new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
+           new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
            d += new_dev
            f += new_fin
 
