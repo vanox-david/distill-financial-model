@@ -159,8 +159,8 @@ with costs_tab:
     admin_annual = costs_sidebar.number_input('Admin & Legal Annual ($)', value=5000)
     conference_annual = costs_sidebar.number_input('Conference Fees Annual ($)', value=15000)
 
-    salary_initial = costs_sidebar.number_input('Salaries Initial Monthly ($)', value=48000)
-    salary_growth = costs_sidebar.slider('Salary Growth Rate (%)', 0, 200, 100) / 100
+    salary_initial = costs_sidebar.number_input('Salaries Initial Monthly ($)', value=36000)
+    salary_growth = costs_sidebar.slider('Salary Growth Rate (%)', 0, 200, 50) / 100
 
     benefits_monthly = costs_sidebar.number_input('Monthly Benefits ($)', value=2000)
 
@@ -168,7 +168,7 @@ with costs_tab:
     support_fin_initial = costs_sidebar.number_input('Support Cost per Financier ($)', value=600)
     support_growth = costs_sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
 
-    compute_initial = costs_sidebar.number_input('Compute Initial ($)', value=500)
+    compute_initial = costs_sidebar.number_input('Compute Initial ($)', value=10000)
     compute_growth = costs_sidebar.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
 
     api_initial = costs_sidebar.number_input('API Initial ($)', value=200)
