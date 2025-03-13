@@ -19,7 +19,7 @@ with revenue_tab:
 
    sidebar.header("Revenue Assumptions")
 
-   months = sidebar.number_input('Projection Period (Months)', min_value=12, max_value=60, value=36)
+   months = sidebar.number_input('Projection Period (Months)', min_value=12, max_value=72, value=48)
    simulations = sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
 
    dev_base_fee = sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
@@ -28,8 +28,9 @@ with revenue_tab:
    fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=10000)
 
    initial_dev = sidebar.number_input('Initial Developer Customers', min_value=0, max_value=20, value=2)
+   dev_delay = sidebar.number_input('Months Delay for Developer Customers', min_value=0, max_value=months, value=9)
    initial_fin = sidebar.number_input('Initial Financier Customers', min_value=0, max_value=20, value=0)
-   fin_delay = sidebar.number_input('Months Delay for Financier Customers', min_value=0, max_value=months, value=9)
+   fin_delay = sidebar.number_input('Months Delay for Financier Customers', min_value=0, max_value=months, value=18)
 
    dev_growth_median = sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
    dev_growth_sigma = 1.1#sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
@@ -55,8 +56,12 @@ with revenue_tab:
               new_fin = int(np.random.lognormal(mean=np.log(fin_growth + 1e-9), sigma=fin_growth_sigma))
            else:
               new_fin = 0
+
+           if m >= dev_delay:
+              new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
+           else: 
+              new_dev = 0 
           
-           new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
            d += new_dev
            f += new_fin
 
