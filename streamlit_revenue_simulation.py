@@ -25,7 +25,7 @@ with revenue_tab:
    dev_base_fee = sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
    dev_seat_fee = sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
    avg_seats = sidebar.slider('Average Seats per Developer', 1, 10, 3)
-   fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=10000)
+   fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=25000)
 
    dev_delay = sidebar.number_input('Months Delay for Developer Customers', min_value=0, max_value=months, value=9)
    fin_delay = sidebar.number_input('Months Delay for Financier Customers', min_value=0, max_value=months, value=18)
