@@ -20,13 +20,13 @@ class RevenueConfig:
     avg_seats_max: int = 10
     
     # Simulation-year revenue
-    sim_year_revenue_mean_default: float = 2000.0
+    sim_year_revenue_mean_default: float = 500.0
     sim_year_revenue_mean_min: float = 500.0
     sim_year_revenue_mean_max: float = 15000.0
     sim_year_revenue_sigma_default: float = 1.0
     sim_year_revenue_sigma_min: float = 0.1
     sim_year_revenue_sigma_max: float = 2.0
-    revenue_per_sim_year_default: float = 0.10
+    revenue_per_sim_year_default: float = 87.60
     
     # Customer growth
     customer_delay_default: int = 9

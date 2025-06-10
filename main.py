@@ -10,22 +10,37 @@ Run with: streamlit run main.py
 
 import streamlit as st
 import sys
+import os
 from pathlib import Path
 
-# Add src directory to path for imports
-sys.path.append(str(Path(__file__).parent / "src"))
+# Add src directory to path for imports - more robust approach
+current_dir = Path(__file__).parent.absolute()
+src_dir = current_dir / "src"
+if str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))
 
-from src.models import FinancialModel
-from src.ui_components import (
-    display_app_header, create_tabs, display_tab_headers,
-    create_simulation_controls, create_revenue_controls, 
-    create_cost_controls, create_export_button
-)
-from src.visualization import (
-    plot_revenue_breakdown_charts, plot_cost_breakdown_charts,
-    plot_earnings_charts, display_summary_metrics, 
-    display_cost_summary_metrics
-)
+# Also add the parent directory to ensure relative imports work
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
+
+try:
+    from src.models import FinancialModel
+    from src.ui_components import (
+        display_app_header, create_tabs, display_tab_headers,
+        create_simulation_controls, create_revenue_controls, 
+        create_cost_controls, create_export_button
+    )
+    from src.visualization import (
+        plot_revenue_breakdown_charts, plot_cost_breakdown_charts,
+        plot_earnings_charts, display_summary_metrics, 
+        display_cost_summary_metrics
+    )
+except ImportError as e:
+    st.error(f"Import error: {e}")
+    st.error("Please ensure you're running this from the correct directory and all dependencies are installed.")
+    st.stop()
+
+import numpy as np
 
 
 def main():
@@ -73,7 +88,6 @@ def main():
         st.divider()
         st.subheader("📊 Quick Statistics")
         
-        import numpy as np
         total_revenue = np.array([result.total_revenue for result in results])
         customers = np.array([result.customers for result in results])
         
@@ -103,7 +117,6 @@ def main():
         st.divider()
         st.subheader("💡 Cost Insights")
         
-        import numpy as np
         total_costs = np.array([result.total_costs for result in results])
         headcount = np.array([result.headcount for result in results])
         salary_costs = np.array([result.salary_costs for result in results])
@@ -131,7 +144,6 @@ def main():
         st.divider()
         st.subheader("🎯 Business Insights")
         
-        import numpy as np
         total_revenue = np.array([result.total_revenue for result in results])
         total_costs = np.array([result.total_costs for result in results])
         
