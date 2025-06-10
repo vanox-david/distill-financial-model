@@ -97,7 +97,7 @@ def create_basic_chart(
     
     # Calculate y-axis range using median as upper limit
     max_median = median.max()
-    y_range = [p10.min()*1.1, max_median * 1.1]  # Add 10% padding above median
+    y_range = [p10.min()-.1*max_median, max_median * 1.1]  # Add 10% padding above median
     
     # Update layout with dark theme and quarterly x-axis labels - MUCH LARGER FONTS
     fig.update_layout(
@@ -181,8 +181,8 @@ def plot_revenue_breakdown_charts(results: List, months: int) -> None:
     
     # Plot charts
     plot_metric_chart(total_revenue, 'Total Monthly Revenue', 'Revenue ($)', CHART_COLORS['revenue'], key='revenue_total')
-    plot_metric_chart(seat_revenue, 'Seat-Based Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='revenue_seat')
-    plot_metric_chart(simulation_revenue, 'Simulation-Year Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='revenue_simulation')
+    plot_metric_chart(seat_revenue, 'Subscription Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='revenue_seat')
+    plot_metric_chart(simulation_revenue, 'Usage Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='revenue_simulation')
     
     st.subheader("Customer Metrics")
     plot_metric_chart(customers, 'Total Customers', 'Customers', CHART_COLORS['info'], key='customers_total')
