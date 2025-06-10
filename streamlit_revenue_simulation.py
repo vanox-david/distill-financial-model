@@ -146,14 +146,14 @@ with costs_tab:
     costs_sidebar = st.sidebar
     costs_sidebar.header("Cost Assumptions")
 
-    hosting_initial = costs_sidebar.number_input('Hosting Initial ($)', value=1500)
+    hosting_initial = costs_sidebar.number_input('Hosting Initial Monthly ($)', value=1500)
     hosting_growth = costs_sidebar.slider('Hosting Growth Rate (%)', 0, 100, 50) / 100
 
     software_initial = costs_sidebar.number_input('Software Subscriptions Initial Monthly ($)', value=2000)
     software_growth = costs_sidebar.slider('Software Growth Rate (%)', 0, 100, 20) / 100
 
-    admin_annual = costs_sidebar.number_input('Admin & Legal Annual ($)', value=15000)
-    conference_annual = costs_sidebar.number_input('Conference Fees Annual ($)', value=5000)
+    admin_monthly = costs_sidebar.number_input('Admin & Legal Monthly ($)', value=15000/12)
+    conference_monthly = costs_sidebar.number_input('Conference Fees Monthly ($)', value=5000/12)
 
     # Headcount-based salary parameters
     salary_per_person = costs_sidebar.number_input('Monthly Salary per Person ($)', value=8000)
@@ -165,13 +165,13 @@ with costs_tab:
 
     benefits_monthly = costs_sidebar.number_input('Monthly Benefits ($)', value=2000)
 
-    support_customer_initial = costs_sidebar.number_input('Support Cost per Customer ($)', value=400)
+    support_customer_initial = costs_sidebar.number_input('Support Cost per Customer Monthly ($)', value=400)
     support_growth = costs_sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
 
     compute_initial = costs_sidebar.number_input('Compute Initial Monthly ($)', value=2000)
     compute_growth = costs_sidebar.slider('Compute Growth Rate (%)', 0, 100, 100) / 100
 
-    api_initial = costs_sidebar.number_input('API Initial ($)', value=200)
+    api_initial = costs_sidebar.number_input('API Initial Monthly ($)', value=200)
     api_growth = costs_sidebar.slider('API Growth Rate (%)', 0, 100, 50) / 100
 
     total_costs, fixed_costs, variable_costs, customer_costs, salary_costs, headcount_results = [], [], [], [], [], []
@@ -204,7 +204,7 @@ with costs_tab:
 
             salary = headcount * salary_per_person
             fixed = (hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor +
-                     admin_annual/12 + conference_annual/12 + benefits_monthly + salary)
+                     admin_monthly + conference_monthly + benefits_monthly + salary)
             
             compute = compute_initial * (1 + compute_growth)**factor
             api = api_initial * (1 + api_growth)**factor
@@ -228,6 +228,9 @@ with costs_tab:
         customer_costs.append(sim_customer)
         salary_costs.append(sim_salary)
         headcount_results.append(sim_headcount)
+
+    # Store headcount data for other tabs
+    shared_data['headcount'] = headcount_results
 
     def plot_costs(data, title):
         p10, med, p90 = np.percentile(data, [10, 50, 90], axis=0)
@@ -254,12 +257,25 @@ with costs_tab:
     plot_costs(salary_costs, 'Salary Costs')
     plot_headcount(headcount_results, 'Headcount Growth')
 
+    # Summary metrics for costs
+    final_month_costs = np.array([sim[-1] for sim in total_costs])
+    final_month_headcount = np.array([sim[-1] for sim in headcount_results])
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Final Month Median Costs", f"${np.median(final_month_costs):,.0f}")
+    with col2:
+        st.metric("Final Month Median Headcount", f"{np.median(final_month_headcount):.0f}")
+    with col3:
+        st.metric("Cost per Employee (Final Month)", f"${np.median(final_month_costs)/np.median(final_month_headcount):,.0f}")
+
 # Updated Earnings Dashboard
 with earnings_tab:
     st.header('Earnings Dashboard')
 
     revenue_simulations = np.array(shared_data['monthly_revenue'])
     cost_simulations = np.array(total_costs)
+    headcount_simulations = np.array(shared_data['headcount'])
 
     earnings_simulations = revenue_simulations - cost_simulations
     cumulative_earnings = np.cumsum(earnings_simulations, axis=1)
@@ -273,11 +289,48 @@ with earnings_tab:
         fig.update_layout(title=title, xaxis_title='Month', yaxis_title='Earnings ($)')
         st.plotly_chart(fig)
 
+    def plot_headcount_earnings(data, title):
+        p10, med, p90 = np.percentile(data, [10, 50, 90], axis=0)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=med, name='Median', line=dict(color='green', width=3)))
+        fig.add_trace(go.Scatter(y=p10, name='10th Percentile', line=dict(color='orange', width=2, dash='dot')))
+        fig.add_trace(go.Scatter(y=p90, name='90th Percentile', line=dict(color='orange', width=2, dash='dot')))
+        fig.update_layout(title=title, xaxis_title='Month', yaxis_title='Headcount')
+        st.plotly_chart(fig)
+
     plot_earnings(earnings_simulations, 'Monthly Earnings')
     plot_earnings(cumulative_earnings, 'Cumulative Earnings')
+    plot_headcount_earnings(headcount_simulations, 'Headcount Evolution')
+
+    # Calculate per-employee metrics
+    revenue_per_employee = revenue_simulations / np.maximum(headcount_simulations, 1)  # Avoid division by zero
+    earnings_per_employee = earnings_simulations / np.maximum(headcount_simulations, 1)
+
+    plot_earnings(revenue_per_employee, 'Revenue per Employee')
+    plot_earnings(earnings_per_employee, 'Earnings per Employee')
 
     break_even_months = [np.argmax(cum > 0) if np.any(cum > 0) else months for cum in cumulative_earnings]
     median_break_even = np.median(break_even_months)
 
-    st.metric(label="Median Break-even Month", value=int(median_break_even))
+    # Enhanced metrics
+    final_earnings = np.array([sim[-1] for sim in cumulative_earnings])
+    final_headcount = np.array([sim[-1] for sim in headcount_simulations])
+    final_revenue = np.array([sim[-1] for sim in revenue_simulations])
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Median Break-even Month", f"{int(median_break_even)}")
+    with col2:
+        st.metric("Final Month Median Headcount", f"{np.median(final_headcount):.0f}")
+    with col3:
+        st.metric("Final Cumulative Earnings", f"${np.median(final_earnings):,.0f}")
+
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        st.metric("Final Revenue per Employee", f"${np.median(final_revenue/np.maximum(final_headcount, 1)):,.0f}")
+    with col5:
+        final_monthly_earnings = np.array([sim[-1] for sim in earnings_simulations])
+        st.metric("Final Monthly Earnings", f"${np.median(final_monthly_earnings):,.0f}")
+    with col6:
+        st.metric("Final Earnings per Employee", f"${np.median(final_monthly_earnings/np.maximum(final_headcount, 1)):,.0f}")
 
