@@ -159,7 +159,7 @@ with costs_tab:
     salary_per_person = costs_sidebar.number_input('Monthly Salary per Person ($)', value=8000)
     initial_headcount = costs_sidebar.number_input('Initial Headcount', min_value=1, max_value=20, value=5)
     headcount_delay = costs_sidebar.number_input('Months Delay for Headcount Growth', min_value=0, max_value=months, value=6)
-    headcount_growth_median = costs_sidebar.slider('Median Headcount Adds', 0.0, 3.0, 1)
+    headcount_growth_median = costs_sidebar.slider('Median Headcount Adds', 0.0, 3.0, 1.0)
     headcount_growth_sigma = 1.0
     headcount_growth_accel = costs_sidebar.slider('Monthly Headcount Growth Acceleration (%)', 0.0, 10.0, 3.0) / 100
 
