@@ -297,7 +297,7 @@ def create_export_button(results: list, months: int) -> None:
         results: Simulation results
         months: Number of months simulated
     """
-    from .visualization import create_export_dataframe
+    from visualization import create_export_dataframe
     
     export_df = create_export_dataframe(results, months)
     
