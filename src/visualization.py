@@ -99,11 +99,11 @@ def create_basic_chart(
     max_median = median.max()
     y_range = [p10.min()*1.1, max_median * 1.1]  # Add 10% padding above median
     
-    # Update layout with dark theme and quarterly x-axis labels
+    # Update layout with dark theme and quarterly x-axis labels - MUCH LARGER FONTS
     fig.update_layout(
         title=dict(
             text=title,
-            font=dict(color='white', size=16)
+            font=dict(color='white', size=24)  # Much larger title
         ),
         xaxis_title='Quarter',
         yaxis_title=yaxis_title,
@@ -111,11 +111,12 @@ def create_basic_chart(
         # Dark theme styling - exact match to reference
         plot_bgcolor='#111827',  # Very dark gray background
         paper_bgcolor='#0F172A',  # Nearly black background
-        font=dict(color='white'),
+        font=dict(color='white', size=20),  # Much larger base font
         xaxis=dict(
             gridcolor='#374151',
             color='white',
-            title_font=dict(color='white'),
+            title_font=dict(color='white', size=22),  # Much larger axis title
+            tickfont=dict(color='white', size=18),    # Much larger tick labels
             tickangle=0,
             # Set custom tick positions and labels for quarterly display
             tickmode='array',
@@ -126,11 +127,12 @@ def create_basic_chart(
         yaxis=dict(
             gridcolor='#374151',
             color='white',  
-            title_font=dict(color='white'),
+            title_font=dict(color='white', size=22),  # Much larger axis title
+            tickfont=dict(color='white', size=18),    # Much larger tick labels
             range=y_range
         ),
         legend=dict(
-            font=dict(color='white'),
+            font=dict(color='white', size=18),  # Much larger legend text
             bgcolor='rgba(15, 23, 42, 0.8)'
         )
     )

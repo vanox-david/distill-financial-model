@@ -54,20 +54,18 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Inject custom CSS for dark theme with much larger text
+    # Inject custom CSS for dark theme
     st.markdown("""
     <style>
     /* Dark theme styling - exact match to reference */
     .main .block-container {
         background-color: #0F172A;
         color: white;
-        font-size: 20px !important;  /* Much larger base font */
     }
     
     /* Sidebar styling */
     .css-1d391kg {
         background-color: #111827;
-        font-size: 18px !important;  /* Larger sidebar text */
     }
     
     /* Metric styling */
@@ -77,97 +75,16 @@ def main():
         padding: 1rem;
         border-radius: 0.5rem;
         color: white;
-        font-size: 22px !important;  /* Larger metric text */
     }
     
-    /* Metric values - make them even larger */
-    [data-testid="metric-container"] [data-testid="metric-value"] {
-        font-size: 32px !important;
-        font-weight: bold !important;
-    }
-    
-    /* Metric labels */
-    [data-testid="metric-container"] [data-testid="metric-label"] {
-        font-size: 18px !important;
-    }
-    
-    /* Headers - much larger */
-    h1 {
+    /* Headers */
+    h1, h2, h3 {
         color: white !important;
-        font-size: 48px !important;
-    }
-    
-    h2 {
-        color: white !important;
-        font-size: 36px !important;
-    }
-    
-    h3 {
-        color: white !important;
-        font-size: 28px !important;
     }
     
     /* Text elements */
     .stMarkdown, .stText {
         color: white !important;
-        font-size: 20px !important;
-    }
-    
-    /* Tab labels */
-    .stTabs [data-baseweb="tab-list"] button {
-        font-size: 24px !important;
-        font-weight: bold !important;
-        padding: 1rem 2rem !important;
-    }
-    
-    /* Slider labels and values */
-    .stSlider label {
-        font-size: 20px !important;
-        font-weight: bold !important;
-    }
-    
-    .stSlider .stSlider-value {
-        font-size: 18px !important;
-    }
-    
-    /* Selectbox and other input labels */
-    .stSelectbox label, .stNumberInput label {
-        font-size: 20px !important;
-        font-weight: bold !important;
-    }
-    
-    /* Button text */
-    .stButton button {
-        font-size: 18px !important;
-        font-weight: bold !important;
-        padding: 0.75rem 1.5rem !important;
-    }
-    
-    /* Table text */
-    .stDataFrame {
-        font-size: 18px !important;
-    }
-    
-    /* Subheader text */
-    .stMarkdown h4 {
-        font-size: 24px !important;
-        color: white !important;
-    }
-    
-    /* Help text and tooltips */
-    .stTooltipHoverTarget {
-        font-size: 18px !important;
-    }
-    
-    /* Column header text */
-    .stColumn h3 {
-        font-size: 24px !important;
-    }
-    
-    /* Ensure all text is readable */
-    p, div, span, label {
-        font-size: 20px !important;
-        line-height: 1.4 !important;
     }
     </style>
     """, unsafe_allow_html=True)
