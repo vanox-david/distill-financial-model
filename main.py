@@ -54,23 +54,23 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Inject custom CSS for dark theme
+    # Inject custom CSS for bg-slate-800 theme
     st.markdown("""
     <style>
-    /* Dark theme styling - exact match to reference */
+    /* bg-slate-800 theme styling */
     .main .block-container {
-        background-color: #0F172A;
+        background-color: #1e293b;
         color: white;
     }
     
     /* Sidebar styling */
     .css-1d391kg {
-        background-color: #111827;
+        background-color: #1e293b;
     }
     
     /* Metric styling */
     [data-testid="metric-container"] {
-        background-color: #111827;
+        background-color: #1e293b;
         border: 1px solid #374151;
         padding: 1rem;
         border-radius: 0.5rem;
@@ -85,6 +85,16 @@ def main():
     /* Text elements */
     .stMarkdown, .stText {
         color: white !important;
+    }
+    
+    /* Streamlit app background */
+    .stApp {
+        background-color: #1e293b;
+    }
+    
+    /* Main content area */
+    .css-18e3th9, .css-1d391kg, .css-12oz5g7 {
+        background-color: #1e293b !important;
     }
     </style>
     """, unsafe_allow_html=True)
