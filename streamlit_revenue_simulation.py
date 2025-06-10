@@ -186,7 +186,7 @@ with costs_tab:
     total_costs, fixed_costs, variable_costs, customer_costs, salary_costs, headcount_results = [], [], [], [], [], []
     # Individual cost component tracking
     hosting_costs, software_costs, admin_costs, conference_costs, benefits_costs = [], [], [], [], []
-    compute_costs = [],
+    compute_costs = []
 
     customers = np.array(shared_data['customers'])
 
@@ -194,7 +194,7 @@ with costs_tab:
         sim_total, sim_fixed, sim_variable, sim_customer, sim_salary, sim_headcount = [], [], [], [], [], []
         # Individual cost tracking
         sim_hosting, sim_software, sim_admin, sim_conference, sim_benefits = [], [], [], [], []
-        sim_compute, sim_api = [], []
+        sim_compute = []
         
         headcount = initial_headcount
         headcount_growth = headcount_growth_median
@@ -229,10 +229,9 @@ with costs_tab:
             fixed = hosting_cost + software_cost + admin_cost + conference_cost + benefits_cost + salary
             
             compute_cost = compute_initial * (1 + compute_growth)**factor
-            api_cost = api_initial * (1 + api_growth)**factor
             customer_cost = support_customer_initial*(1+support_growth)**factor * customers[sim, month]
 
-            variable = compute_cost + api_cost + customer_cost
+            variable = compute_cost  + customer_cost
             total = fixed + variable
 
             # Store individual components
@@ -250,7 +249,6 @@ with costs_tab:
             sim_conference.append(conference_cost)
             sim_benefits.append(benefits_cost)
             sim_compute.append(compute_cost)
-            sim_api.append(api_cost)
 
         total_costs.append(sim_total)
         fixed_costs.append(sim_fixed)
@@ -266,7 +264,6 @@ with costs_tab:
         conference_costs.append(sim_conference)
         benefits_costs.append(sim_benefits)
         compute_costs.append(sim_compute)
-        api_costs.append(sim_api)
 
     # Store headcount data for other tabs
     shared_data['headcount'] = headcount_results
@@ -302,7 +299,6 @@ with costs_tab:
     plot_costs(software_costs, 'Software Subscription Costs')
     plot_costs(compute_costs, 'Compute Costs')
     plot_costs(customer_costs, 'Customer Support Costs')
-    plot_costs(api_costs, 'API Costs')
     plot_costs(admin_costs, 'Admin & Legal Costs')
     plot_costs(conference_costs, 'Conference Costs')
     plot_costs(benefits_costs, 'Benefits Costs')
