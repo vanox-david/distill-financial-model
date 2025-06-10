@@ -36,47 +36,121 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Inject custom CSS for bg-slate-800 theme
+    # Inject custom CSS for cohesive slate theme matching charts
     st.markdown("""
     <style>
-    /* bg-slate-800 theme styling */
+    /* Cohesive slate theme - consistent with chart backgrounds */
     .main .block-container {
-        background-color: #1e293b;
+        background-color: #0f172a;  /* slate-900 - slightly darker main area */
         color: white;
+        border-radius: 0.75rem;
+        border: 1px solid #334155;  /* slate-600 border */
     }
     
-    /* Sidebar styling */
+    /* Sidebar styling - matches chart background exactly */
     .css-1d391kg {
-        background-color: #1e293b;
+        background-color: #1e293b;  /* slate-800 - same as charts */
+        border-right: 2px solid #334155;  /* slate-600 border */
     }
     
-    /* Metric styling */
+    /* Sidebar headers and labels */
+    .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3, .css-1d391kg label {
+        color: #f1f5f9 !important;  /* slate-100 */
+    }
+    
+    /* Metric styling - elevated design */
     [data-testid="metric-container"] {
-        background-color: #1e293b;
-        border: 1px solid #374151;
-        padding: 1rem;
-        border-radius: 0.5rem;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid #475569;  /* slate-600 */
+        padding: 1.25rem;
+        border-radius: 0.75rem;
         color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
     
-    /* Headers */
-    h1, h2, h3 {
-        color: white !important;
+    /* Metric values - enhanced styling */
+    [data-testid="metric-container"] [data-testid="metric-value"] {
+        color: #f1f5f9 !important;  /* slate-100 */
+        font-weight: 700 !important;
+    }
+    
+    /* Headers - gradient text */
+    h1 {
+        color: #f8fafc !important;  /* slate-50 */
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    h2, h3 {
+        color: #e2e8f0 !important;  /* slate-200 */
     }
     
     /* Text elements */
     .stMarkdown, .stText {
-        color: white !important;
+        color: #cbd5e1 !important;  /* slate-300 */
     }
     
     /* Streamlit app background */
     .stApp {
-        background-color: #1e293b;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     }
     
-    /* Main content area */
-    .css-18e3th9, .css-1d391kg, .css-12oz5g7 {
-        background-color: #1e293b !important;
+    /* Tab styling - consistent with sidebar */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #1e293b;
+        border-radius: 0.5rem;
+        padding: 0.25rem;
+        border: 1px solid #334155;
+    }
+    
+    .stTabs [data-baseweb="tab-list"] button {
+        background-color: transparent !important;
+        color: #94a3b8 !important;  /* slate-400 */
+        border-radius: 0.375rem !important;
+    }
+    
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        background-color: #334155 !important;  /* slate-600 */
+        color: #f1f5f9 !important;  /* slate-100 */
+    }
+    
+    /* Input styling */
+    .stNumberInput input, .stSlider, .stSelectbox select {
+        background-color: #334155 !important;  /* slate-600 */
+        color: white !important;
+        border: 1px solid #475569 !important;  /* slate-600 */
+        border-radius: 0.375rem !important;
+    }
+    
+    /* Dividers */
+    .stMarkdown hr {
+        border-color: #475569 !important;  /* slate-600 */
+        margin: 2rem 0 !important;
+    }
+    
+    /* Button styling */
+    .stButton button {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 0.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .stButton button:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3) !important;
+    }
+    
+    /* Download button special styling */
+    .stDownloadButton button {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+    
+    .stDownloadButton button:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3) !important;
     }
     </style>
     """, unsafe_allow_html=True)
