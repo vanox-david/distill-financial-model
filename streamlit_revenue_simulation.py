@@ -22,67 +22,53 @@ with revenue_tab:
    months = sidebar.number_input('Projection Period (Months)', min_value=12, max_value=72, value=48)
    simulations = sidebar.number_input('Number of Simulations', min_value=100, max_value=1000, value=250)
 
-   dev_base_fee = sidebar.number_input('Monthly Developer Base Fee ($)', value=5000)
-   dev_seat_fee = sidebar.number_input('Monthly Fee per Additional Seat ($)', value=1000)
-   avg_seats = sidebar.slider('Average Seats per Developer', 1, 10, 3)
-   fin_project_fee = sidebar.number_input('Revenue per Financier Project ($)', value=25000)
+   seat_fee = sidebar.number_input('Monthly Fee per Seat ($)', value=1000)
+   avg_seats = sidebar.slider('Average Seats per Customer', 1, 10, 3)
+   simulation_year_revenue = sidebar.number_input('Revenue per Simulation-Year ($)', value=87.60)
+   
+   # Convert simulation-year revenue to monthly
+   monthly_simulation_revenue = simulation_year_revenue / 12
 
-   dev_delay = sidebar.number_input('Months Delay for Developer Customers', min_value=0, max_value=months, value=9)
-   fin_delay = sidebar.number_input('Months Delay for Financier Customers', min_value=0, max_value=months, value=18)
+   customer_delay = sidebar.number_input('Months Delay for Customer Acquisition', min_value=0, max_value=months, value=9)
 
-   dev_growth_median = sidebar.slider('Median Developer Adds', 0.0, 3.0, .7)
-   dev_growth_sigma = 1.1#sidebar.slider('Developer Growth Volatility', 0.1, 2.0, 1.1)
-   dev_growth_accel = sidebar.slider('Monthly Developer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
-
-   fin_growth_median = sidebar.slider('Median Financier Adds', 0.0, 5.0, .5)
-   fin_growth_sigma = 1.0 #sidebar.slider('Financier Growth Volatility', 0.1, 2.0, 1.0)
-   fin_growth_accel = sidebar.slider('Monthly Financier Growth Acceleration (%)', 0.0, 10.0, 2.0) / 100
+   customer_growth_median = sidebar.slider('Median Customer Adds', 0.0, 3.0, .7)
+   customer_growth_sigma = 1.1
+   customer_growth_accel = sidebar.slider('Monthly Customer Growth Acceleration (%)', 0.0, 10.0, 5.0) / 100
 
    monthly_churn_median = sidebar.slider('Median Monthly Churn Rate (%)', 0.0, 10.0, 5.0) / 100
-   monthly_churn_sigma = 1.0# sidebar.slider('Churn Rate Volatility', 0.01, 2.0, 1.0)
+   monthly_churn_sigma = 1.0
 
-   rev_results, dev_results, fin_results, churn_results = [], [], [], []
+   rev_results, customer_results, churn_results = [], [], []
 
    for _ in range(simulations):
-       revenue, dev_customers, fin_customers, churn_total = [], [], [], []
-       d, f = 0, 0
-       dev_growth = dev_growth_median
-       fin_growth = fin_growth_median
+       revenue, customers, churn_total = [], [], []
+       c = 0
+       customer_growth = customer_growth_median
 
        for m in range(months):
-           if m >= fin_delay:
-              new_fin = int(np.random.lognormal(mean=np.log(fin_growth + 1e-9), sigma=fin_growth_sigma))
+           if m >= customer_delay:
+              new_customers = int(np.random.lognormal(mean=np.log(customer_growth + 1e-9), sigma=customer_growth_sigma))
            else:
-              new_fin = 0
-
-           if m >= dev_delay:
-              new_dev = int(np.random.lognormal(mean=np.log(dev_growth + 1e-9), sigma=dev_growth_sigma))
-           else: 
-              new_dev = 0 
+              new_customers = 0
           
-           d += new_dev
-           f += new_fin
+           c += new_customers
 
            churn_rate = np.random.lognormal(mean=np.log(monthly_churn_median + 1e-9), sigma=monthly_churn_sigma)
            churn_rate = min(churn_rate, 0.5)
-           churn_d = int(np.random.binomial(d, churn_rate))
-           churn_f = int(np.random.binomial(f, churn_rate))
-           d = max(0, d - churn_d)
-           f = max(0, f - churn_f)
+           churn_c = int(np.random.binomial(c, churn_rate))
+           c = max(0, c - churn_c)
 
-           dev_growth *= (1 + dev_growth_accel)
-           fin_growth *= (1 + fin_growth_accel)
+           customer_growth *= (1 + customer_growth_accel)
 
-           month_rev = (d * (dev_base_fee + avg_seats * dev_seat_fee)) + (f * fin_project_fee)
+           # Simplified revenue calculation: seat fees + simulation revenue
+           month_rev = (c * avg_seats * seat_fee) + monthly_simulation_revenue
 
            revenue.append(month_rev)
-           dev_customers.append(d)
-           fin_customers.append(f)
-           churn_total.append(churn_d + churn_f)
+           customers.append(c)
+           churn_total.append(churn_c)
 
        rev_results.append(revenue)
-       dev_results.append(dev_customers)
-       fin_results.append(fin_customers)
+       customer_results.append(customers)
        churn_results.append(churn_total)
 
    def get_quantiles(data):
@@ -90,8 +76,7 @@ with revenue_tab:
        return df.quantile(0.1), df.median(), df.quantile(0.9)
 
    rev_p10, rev_med, rev_p90 = get_quantiles(rev_results)
-   dev_p10, dev_med, dev_p90 = get_quantiles(dev_results)
-   fin_p10, fin_med, fin_p90 = get_quantiles(fin_results)
+   customer_p10, customer_med, customer_p90 = get_quantiles(customer_results)
    churn_p10, churn_med, churn_p90 = get_quantiles(churn_results)
 
    fig = go.Figure()
@@ -111,15 +96,12 @@ with revenue_tab:
       fig.update_layout(title=title, xaxis_title='Month', yaxis_title=yaxis)
       st.plotly_chart(fig)
 
-   plot_metric(dev_p10, dev_med, dev_p90, 'Total Developer Customers', 'Developers')
-   plot_metric(fin_p10, fin_med, fin_p90, 'Total Financier Customers', 'Financiers')
+   plot_metric(customer_p10, customer_med, customer_p90, 'Total Customers', 'Customers')
    plot_metric(churn_p10, churn_med, churn_p90, 'Total Monthly Churn', 'Customers Lost')
-
 
    shared_data['months'] = months
    shared_data['simulations'] = simulations
-   shared_data['dev_customers'] = dev_results
-   shared_data['fin_customers'] = fin_results
+   shared_data['customers'] = customer_results
    shared_data['monthly_revenue'] = rev_results
    
    export_df = pd.DataFrame({
@@ -127,8 +109,7 @@ with revenue_tab:
        'Median Revenue': rev_med,
        '10th Percentile Revenue': rev_p10,
        '90th Percentile Revenue': rev_p90,
-       'Median Developers': dev_med.astype(int),
-       'Median Financiers': fin_med.astype(int),
+       'Median Customers': customer_med.astype(int),
        'Median Churn': churn_med.astype(int)
    })
    
@@ -142,7 +123,8 @@ with revenue_tab:
        file_name="detailed_revenue_projections.xlsx",
        mime="application/vnd.ms-excel"
    )
-   # Updated Costs Dashboard
+
+# Updated Costs Dashboard
 with costs_tab:
     st.header('Costs Dashboard')
     costs_sidebar = st.sidebar
@@ -162,8 +144,7 @@ with costs_tab:
 
     benefits_monthly = costs_sidebar.number_input('Monthly Benefits ($)', value=2000)
 
-    support_dev_initial = costs_sidebar.number_input('Support Cost per Developer ($)', value=200)
-    support_fin_initial = costs_sidebar.number_input('Support Cost per Financier ($)', value=600)
+    support_customer_initial = costs_sidebar.number_input('Support Cost per Customer ($)', value=400)
     support_growth = costs_sidebar.slider('Support Growth Rate (%)', 0, 100, 50) / 100
 
     compute_initial = costs_sidebar.number_input('Compute Initial Monthly ($)', value=2000)
@@ -172,13 +153,12 @@ with costs_tab:
     api_initial = costs_sidebar.number_input('API Initial ($)', value=200)
     api_growth = costs_sidebar.slider('API Growth Rate (%)', 0, 100, 50) / 100
 
-    total_costs, fixed_costs, variable_costs, dev_costs, fin_costs, salary_costs = [], [], [], [], [], []
+    total_costs, fixed_costs, variable_costs, customer_costs, salary_costs = [], [], [], [], []
 
-    dev_customers = np.array(shared_data['dev_customers'])
-    fin_customers = np.array(shared_data['fin_customers'])
+    customers = np.array(shared_data['customers'])
 
     for sim in range(simulations):
-        sim_total, sim_fixed, sim_variable, sim_dev, sim_fin, sim_salary = [], [], [], [], [], []
+        sim_total, sim_fixed, sim_variable, sim_customer, sim_salary = [], [], [], [], []
 
         for month in range(months):
             factor = month // 12
@@ -190,25 +170,22 @@ with costs_tab:
             compute = compute_initial * (1 + compute_growth)**factor
             api = api_initial * (1 + api_growth)**factor
 
-            dev_cost = support_dev_initial*(1+support_growth)**factor * dev_customers[sim, month]
-            fin_cost = support_fin_initial*(1+support_growth)**factor * fin_customers[sim, month]
+            customer_cost = support_customer_initial*(1+support_growth)**factor * customers[sim, month]
 
-            variable = compute + api + dev_cost + fin_cost
+            variable = compute + api + customer_cost
 
             total = fixed + variable
 
             sim_total.append(total)
             sim_fixed.append(fixed)
             sim_variable.append(variable)
-            sim_dev.append(dev_cost)
-            sim_fin.append(fin_cost)
+            sim_customer.append(customer_cost)
             sim_salary.append(salary)
 
         total_costs.append(sim_total)
         fixed_costs.append(sim_fixed)
         variable_costs.append(sim_variable)
-        dev_costs.append(sim_dev)
-        fin_costs.append(sim_fin)
+        customer_costs.append(sim_customer)
         salary_costs.append(sim_salary)
 
     def plot_costs(data, title):
@@ -223,8 +200,7 @@ with costs_tab:
     plot_costs(total_costs, 'Total Monthly Costs')
     plot_costs(fixed_costs, 'Fixed Monthly Costs')
     plot_costs(variable_costs, 'Variable Monthly Costs')
-    plot_costs(dev_costs, 'Developer Customer Costs')
-    plot_costs(fin_costs, 'Financial Customer Costs')
+    plot_costs(customer_costs, 'Customer Support Costs')
     plot_costs(salary_costs, 'Salary Costs')
 
 # Updated Earnings Dashboard
