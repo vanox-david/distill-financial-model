@@ -24,10 +24,11 @@ with revenue_tab:
 
    seat_fee = sidebar.number_input('Monthly Fee per Seat ($)', value=1000)
    avg_seats = sidebar.slider('Average Seats per Customer', 1, 10, 3)
-   simulation_year_revenue = sidebar.number_input('Revenue per Simulation-Year ($)', value=87.60)
    
-   # Convert simulation-year revenue to monthly
-   monthly_simulation_revenue = simulation_year_revenue / 12
+   # Simulation-year revenue parameters
+   sim_year_revenue_mean = sidebar.number_input('Mean Simulation-Years per Customer per Month', min_value=500.0, max_value=15000.0, value=2000.0)
+   sim_year_revenue_sigma = sidebar.slider('Simulation-Year Usage Volatility', 0.1, 2.0, 1.0)
+   revenue_per_sim_year = sidebar.number_input('Revenue per Simulation-Year ($)', value=0.10)
 
    customer_delay = sidebar.number_input('Months Delay for Customer Acquisition', min_value=0, max_value=months, value=9)
 
@@ -60,8 +61,23 @@ with revenue_tab:
 
            customer_growth *= (1 + customer_growth_accel)
 
-           # Simplified revenue calculation: seat fees + simulation revenue
-           month_rev = (c * avg_seats * seat_fee) + monthly_simulation_revenue
+           # Calculate simulation-year revenue with random process
+           if c > 0:
+               # Each customer has random simulation usage
+               sim_years_total = 0
+               for _ in range(c):
+                   customer_sim_years = np.random.lognormal(
+                       mean=np.log(sim_year_revenue_mean + 1e-9), 
+                       sigma=sim_year_revenue_sigma
+                   )
+                   sim_years_total += customer_sim_years
+               
+               simulation_revenue = sim_years_total * revenue_per_sim_year
+           else:
+               simulation_revenue = 0
+
+           # Revenue calculation: seat fees + simulation revenue
+           month_rev = (c * avg_seats * seat_fee) + simulation_revenue
 
            revenue.append(month_rev)
            customers.append(c)
@@ -136,11 +152,16 @@ with costs_tab:
     software_initial = costs_sidebar.number_input('Software Subscriptions Initial Monthly ($)', value=2000)
     software_growth = costs_sidebar.slider('Software Growth Rate (%)', 0, 100, 20) / 100
 
-    admin_annual = costs_sidebar.number_input('Admin & Legal Annual ($)', value=5000)
-    conference_annual = costs_sidebar.number_input('Conference Fees Annual ($)', value=15000)
+    admin_annual = costs_sidebar.number_input('Admin & Legal Annual ($)', value=15000)
+    conference_annual = costs_sidebar.number_input('Conference Fees Annual ($)', value=5000)
 
-    salary_initial = costs_sidebar.number_input('Salaries Initial Monthly ($)', value=24000)
-    salary_growth = costs_sidebar.slider('Salary Growth Rate (%)', 0, 200, 50) / 100
+    # Headcount-based salary parameters
+    salary_per_person = costs_sidebar.number_input('Monthly Salary per Person ($)', value=8000)
+    initial_headcount = costs_sidebar.number_input('Initial Headcount', min_value=1, max_value=20, value=5)
+    headcount_delay = costs_sidebar.number_input('Months Delay for Headcount Growth', min_value=0, max_value=months, value=6)
+    headcount_growth_median = costs_sidebar.slider('Median Headcount Adds', 0.0, 3.0, 1)
+    headcount_growth_sigma = 1.0
+    headcount_growth_accel = costs_sidebar.slider('Monthly Headcount Growth Acceleration (%)', 0.0, 10.0, 3.0) / 100
 
     benefits_monthly = costs_sidebar.number_input('Monthly Benefits ($)', value=2000)
 
@@ -153,17 +174,35 @@ with costs_tab:
     api_initial = costs_sidebar.number_input('API Initial ($)', value=200)
     api_growth = costs_sidebar.slider('API Growth Rate (%)', 0, 100, 50) / 100
 
-    total_costs, fixed_costs, variable_costs, customer_costs, salary_costs = [], [], [], [], []
+    total_costs, fixed_costs, variable_costs, customer_costs, salary_costs, headcount_results = [], [], [], [], [], []
 
     customers = np.array(shared_data['customers'])
 
     for sim in range(simulations):
-        sim_total, sim_fixed, sim_variable, sim_customer, sim_salary = [], [], [], [], []
+        sim_total, sim_fixed, sim_variable, sim_customer, sim_salary, sim_headcount = [], [], [], [], [], []
+        headcount = initial_headcount
+        headcount_growth = headcount_growth_median
 
         for month in range(months):
+            # Headcount growth simulation
+            if month >= headcount_delay:
+                # Slow down growth above 15 people
+                if headcount >= 15:
+                    # Apply 50% reduction in growth rate for larger teams
+                    adjusted_growth = headcount_growth * 0.5
+                else:
+                    adjusted_growth = headcount_growth
+                
+                new_headcount = int(np.random.lognormal(mean=np.log(adjusted_growth + 1e-9), sigma=headcount_growth_sigma))
+            else:
+                new_headcount = 0
+            
+            headcount += new_headcount
+            headcount_growth *= (1 + headcount_growth_accel)
+
             factor = month // 12
 
-            salary = salary_initial * (1 + salary_growth)**factor 
+            salary = headcount * salary_per_person
             fixed = (hosting_initial*(1+hosting_growth)**factor + software_initial*(1+software_growth)**factor +
                      admin_annual/12 + conference_annual/12 + benefits_monthly + salary)
             
@@ -181,12 +220,14 @@ with costs_tab:
             sim_variable.append(variable)
             sim_customer.append(customer_cost)
             sim_salary.append(salary)
+            sim_headcount.append(headcount)
 
         total_costs.append(sim_total)
         fixed_costs.append(sim_fixed)
         variable_costs.append(sim_variable)
         customer_costs.append(sim_customer)
         salary_costs.append(sim_salary)
+        headcount_results.append(sim_headcount)
 
     def plot_costs(data, title):
         p10, med, p90 = np.percentile(data, [10, 50, 90], axis=0)
@@ -197,11 +238,21 @@ with costs_tab:
         fig.update_layout(title=title, xaxis_title='Month', yaxis_title='Cost ($)')
         st.plotly_chart(fig)
 
+    def plot_headcount(data, title):
+        p10, med, p90 = np.percentile(data, [10, 50, 90], axis=0)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(y=med, name='Median', line=dict(color='blue', width=3)))
+        fig.add_trace(go.Scatter(y=p10, name='10th Percentile', line=dict(color='red', width=2, dash='dot')))
+        fig.add_trace(go.Scatter(y=p90, name='90th Percentile', line=dict(color='red', width=2, dash='dot')))
+        fig.update_layout(title=title, xaxis_title='Month', yaxis_title='Headcount')
+        st.plotly_chart(fig)
+
     plot_costs(total_costs, 'Total Monthly Costs')
     plot_costs(fixed_costs, 'Fixed Monthly Costs')
     plot_costs(variable_costs, 'Variable Monthly Costs')
     plot_costs(customer_costs, 'Customer Support Costs')
     plot_costs(salary_costs, 'Salary Costs')
+    plot_headcount(headcount_results, 'Headcount Growth')
 
 # Updated Earnings Dashboard
 with earnings_tab:
