@@ -110,7 +110,7 @@ def create_basic_chart(
         hovermode='x unified',
         # Dark theme styling - exact match to reference
         plot_bgcolor='#1e293b',  # bg-slate-800 background
-        paper_bgcolor='#0F172A',  # Nearly black background
+        paper_bgcolor='#1e293b',  # bg-slate-800 background for entire chart area
         font=dict(color='white', size=20),  # Much larger base font
         xaxis=dict(
             gridcolor='#374151',
