@@ -98,9 +98,9 @@ class SimulationConfig:
     """Configuration for simulation parameters."""
     
     # Simulation parameters
-    months_default: int = 48
+    months_default: int = 24
     months_min: int = 12
-    months_max: int = 72
+    months_max: int = 36
     
     simulations_default: int = 250
     simulations_min: int = 100

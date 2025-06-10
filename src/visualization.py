@@ -98,7 +98,8 @@ def plot_metric_chart(
     data: List[List[float]], 
     title: str, 
     yaxis_title: str, 
-    color: str = CHART_COLORS['primary']
+    color: str = CHART_COLORS['primary'],
+    key: str = None
 ) -> None:
     """
     Plot a metric chart with quantiles using Streamlit.
@@ -108,10 +109,11 @@ def plot_metric_chart(
         title: Chart title
         yaxis_title: Y-axis label
         color: Primary color for the chart
+        key: Unique key for the plotly chart element
     """
     p10, median, p90 = get_quantiles(data)
     fig = create_basic_chart(p10, median, p90, title, yaxis_title, color)
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, key=key)
 
 
 def plot_revenue_breakdown_charts(results: List, months: int) -> None:
@@ -132,13 +134,13 @@ def plot_revenue_breakdown_charts(results: List, months: int) -> None:
     churn = [result.churn for result in results]
     
     # Plot charts
-    plot_metric_chart(total_revenue, 'Total Monthly Revenue', 'Revenue ($)', CHART_COLORS['revenue'])
-    plot_metric_chart(seat_revenue, 'Seat-Based Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'])
-    plot_metric_chart(simulation_revenue, 'Simulation-Year Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'])
+    plot_metric_chart(total_revenue, 'Total Monthly Revenue', 'Revenue ($)', CHART_COLORS['revenue'], key='revenue_total')
+    plot_metric_chart(seat_revenue, 'Seat-Based Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='revenue_seat')
+    plot_metric_chart(simulation_revenue, 'Simulation-Year Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='revenue_simulation')
     
     st.subheader("Customer Metrics")
-    plot_metric_chart(customers, 'Total Customers', 'Customers', CHART_COLORS['info'])
-    plot_metric_chart(churn, 'Monthly Churn', 'Customers Lost', CHART_COLORS['warning'])
+    plot_metric_chart(customers, 'Total Customers', 'Customers', CHART_COLORS['info'], key='customers_total')
+    plot_metric_chart(churn, 'Monthly Churn', 'Customers Lost', CHART_COLORS['warning'], key='customers_churn')
 
 
 def plot_cost_breakdown_charts(results: List, months: int) -> None:
@@ -167,24 +169,24 @@ def plot_cost_breakdown_charts(results: List, months: int) -> None:
     
     # Aggregate cost charts
     st.subheader("Aggregate Cost Views")
-    plot_metric_chart(total_costs, 'Total Monthly Costs', 'Cost ($)', CHART_COLORS['cost'])
-    plot_metric_chart(fixed_costs, 'Fixed Monthly Costs', 'Cost ($)', CHART_COLORS['cost_secondary'])
-    plot_metric_chart(variable_costs, 'Variable Monthly Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'])
+    plot_metric_chart(total_costs, 'Total Monthly Costs', 'Cost ($)', CHART_COLORS['cost'], key='costs_total')
+    plot_metric_chart(fixed_costs, 'Fixed Monthly Costs', 'Cost ($)', CHART_COLORS['cost_secondary'], key='costs_fixed')
+    plot_metric_chart(variable_costs, 'Variable Monthly Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'], key='costs_variable')
     
     # Individual cost component charts
     st.subheader("Individual Cost Components")
-    plot_metric_chart(salary_costs, 'Salary Costs', 'Cost ($)', CHART_COLORS['primary'])
-    plot_metric_chart(hosting_costs, 'Hosting Costs', 'Cost ($)', CHART_COLORS['info'])
-    plot_metric_chart(software_costs, 'Software Subscription Costs', 'Cost ($)', CHART_COLORS['success'])
-    plot_metric_chart(compute_costs, 'Compute Costs', 'Cost ($)', CHART_COLORS['warning'])
-    plot_metric_chart(customer_support_costs, 'Customer Support Costs', 'Cost ($)', CHART_COLORS['danger'])
-    plot_metric_chart(admin_costs, 'Admin & Legal Costs', 'Cost ($)', 'purple')
-    plot_metric_chart(conference_costs, 'Conference Costs', 'Cost ($)', 'brown')
-    plot_metric_chart(benefits_costs, 'Benefits Costs', 'Cost ($)', 'pink')
+    plot_metric_chart(salary_costs, 'Salary Costs', 'Cost ($)', CHART_COLORS['primary'], key='costs_salary')
+    plot_metric_chart(hosting_costs, 'Hosting Costs', 'Cost ($)', CHART_COLORS['info'], key='costs_hosting')
+    plot_metric_chart(software_costs, 'Software Subscription Costs', 'Cost ($)', CHART_COLORS['success'], key='costs_software')
+    plot_metric_chart(compute_costs, 'Compute Costs', 'Cost ($)', CHART_COLORS['warning'], key='costs_compute')
+    plot_metric_chart(customer_support_costs, 'Customer Support Costs', 'Cost ($)', CHART_COLORS['danger'], key='costs_support')
+    plot_metric_chart(admin_costs, 'Admin & Legal Costs', 'Cost ($)', 'purple', key='costs_admin')
+    plot_metric_chart(conference_costs, 'Conference Costs', 'Cost ($)', 'brown', key='costs_conference')
+    plot_metric_chart(benefits_costs, 'Benefits Costs', 'Cost ($)', 'pink', key='costs_benefits')
     
     # Headcount chart
     st.subheader("Team Growth")
-    plot_metric_chart(headcount, 'Headcount Growth', 'Headcount', CHART_COLORS['headcount'])
+    plot_metric_chart(headcount, 'Headcount Growth', 'Headcount', CHART_COLORS['headcount'], key='costs_headcount')
 
 
 def plot_earnings_charts(results: List, months: int) -> None:
@@ -207,34 +209,34 @@ def plot_earnings_charts(results: List, months: int) -> None:
     
     # Main earnings charts
     st.subheader("Earnings Overview")
-    plot_metric_chart(earnings.tolist(), 'Monthly Earnings', 'Earnings ($)', CHART_COLORS['success'])
-    plot_metric_chart(cumulative_earnings.tolist(), 'Cumulative Earnings', 'Earnings ($)', CHART_COLORS['success'])
+    plot_metric_chart(earnings.tolist(), 'Monthly Earnings', 'Earnings ($)', CHART_COLORS['success'], key='earnings_monthly')
+    plot_metric_chart(cumulative_earnings.tolist(), 'Cumulative Earnings', 'Earnings ($)', CHART_COLORS['success'], key='earnings_cumulative')
     
     # Revenue breakdown in earnings context
     st.subheader("Revenue Breakdown")
-    plot_metric_chart(total_revenue.tolist(), 'Total Revenue', 'Revenue ($)', CHART_COLORS['revenue'])
-    plot_metric_chart(seat_revenue.tolist(), 'Seat-Based Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'])
-    plot_metric_chart(simulation_revenue.tolist(), 'Simulation-Year Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'])
+    plot_metric_chart(total_revenue.tolist(), 'Total Revenue', 'Revenue ($)', CHART_COLORS['revenue'], key='earnings_revenue_total')
+    plot_metric_chart(seat_revenue.tolist(), 'Seat-Based Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='earnings_revenue_seat')
+    plot_metric_chart(simulation_revenue.tolist(), 'Simulation-Year Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='earnings_revenue_simulation')
     
     # Cost breakdown in earnings context
     st.subheader("Cost Breakdown")
     fixed_costs = np.array([result.fixed_costs for result in results])
     variable_costs = np.array([result.variable_costs for result in results])
     
-    plot_metric_chart(total_costs.tolist(), 'Total Costs', 'Cost ($)', CHART_COLORS['cost'])
-    plot_metric_chart(fixed_costs.tolist(), 'Fixed Costs', 'Cost ($)', CHART_COLORS['cost_secondary'])
-    plot_metric_chart(variable_costs.tolist(), 'Variable Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'])
+    plot_metric_chart(total_costs.tolist(), 'Total Costs', 'Cost ($)', CHART_COLORS['cost'], key='earnings_costs_total')
+    plot_metric_chart(fixed_costs.tolist(), 'Fixed Costs', 'Cost ($)', CHART_COLORS['cost_secondary'], key='earnings_costs_fixed')
+    plot_metric_chart(variable_costs.tolist(), 'Variable Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'], key='earnings_costs_variable')
     
     # Team and productivity
     st.subheader("Team and Productivity")
-    plot_metric_chart(headcount.tolist(), 'Headcount Evolution', 'Headcount', CHART_COLORS['headcount'])
+    plot_metric_chart(headcount.tolist(), 'Headcount Evolution', 'Headcount', CHART_COLORS['headcount'], key='earnings_headcount')
     
     # Per-employee metrics (avoid division by zero)
     revenue_per_employee = total_revenue / np.maximum(headcount, 1)
     earnings_per_employee = earnings / np.maximum(headcount, 1)
     
-    plot_metric_chart(revenue_per_employee.tolist(), 'Revenue per Employee', 'Revenue per Employee ($)', CHART_COLORS['info'])
-    plot_metric_chart(earnings_per_employee.tolist(), 'Earnings per Employee', 'Earnings per Employee ($)', CHART_COLORS['success'])
+    plot_metric_chart(revenue_per_employee.tolist(), 'Revenue per Employee', 'Revenue per Employee ($)', CHART_COLORS['info'], key='earnings_revenue_per_employee')
+    plot_metric_chart(earnings_per_employee.tolist(), 'Earnings per Employee', 'Earnings per Employee ($)', CHART_COLORS['success'], key='earnings_per_employee')
 
 
 def display_summary_metrics(results: List, months: int) -> None:
