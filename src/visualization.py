@@ -50,24 +50,29 @@ def create_basic_chart(
     Returns:
         Plotly figure object
     """
-    # Generate quarterly labels for x-axis
+    # Keep monthly data resolution but create quarterly labels for x-axis
     months = len(median)
+    monthly_indices = list(range(months))
+    
+    # Generate quarterly labels and their positions
     quarterly_labels = generate_quarterly_labels(months)
+    quarterly_positions = list(range(0, months, 3))  # Every 3 months
+    quarterly_labels_display = [quarterly_labels[i] for i in quarterly_positions if i < len(quarterly_labels)]
     
     fig = go.Figure()
     
-    # Add median line
+    # Add median line (using monthly indices for full resolution)
     fig.add_trace(go.Scatter(
-        x=quarterly_labels,
+        x=monthly_indices,
         y=median, 
         mode='lines', 
         name='Median',
         line=dict(color=color, width=CHART_STYLE['median_width'])
     ))
     
-    # Add percentile lines
+    # Add percentile lines (using monthly indices for full resolution)
     fig.add_trace(go.Scatter(
-        x=quarterly_labels,
+        x=monthly_indices,
         y=p10, 
         mode='lines', 
         name='10th Percentile',
@@ -79,7 +84,7 @@ def create_basic_chart(
     ))
     
     fig.add_trace(go.Scatter(
-        x=quarterly_labels,
+        x=monthly_indices,
         y=p90, 
         mode='lines', 
         name='90th Percentile',
@@ -94,7 +99,7 @@ def create_basic_chart(
     max_median = median.max()
     y_range = [p10.min()*1.1, max_median * 1.1]  # Add 10% padding above median
     
-    # Update layout with dark theme
+    # Update layout with dark theme and quarterly x-axis labels
     fig.update_layout(
         title=dict(
             text=title,
@@ -111,7 +116,12 @@ def create_basic_chart(
             gridcolor='#374151',
             color='white',
             title_font=dict(color='white'),
-            tickangle=0
+            tickangle=0,
+            # Set custom tick positions and labels for quarterly display
+            tickmode='array',
+            tickvals=quarterly_positions[:len(quarterly_labels_display)],
+            ticktext=quarterly_labels_display,
+            range=[-0.5, months - 0.5]  # Show full range with slight padding
         ),
         yaxis=dict(
             gridcolor='#374151',
