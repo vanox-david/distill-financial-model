@@ -109,7 +109,7 @@ def create_basic_chart(
         yaxis_title=yaxis_title,
         hovermode='x unified',
         # Dark theme styling - exact match to reference
-        plot_bgcolor='#111827',  # Very dark gray background
+        plot_bgcolor='#3C4043',  # Dark grayish-blue background to match user's color
         paper_bgcolor='#0F172A',  # Nearly black background
         font=dict(color='white', size=20),  # Much larger base font
         xaxis=dict(
