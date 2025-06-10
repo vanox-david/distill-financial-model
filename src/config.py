@@ -74,12 +74,12 @@ class CostConfig:
     headcount_growth_median_default: float = 1.0
     headcount_growth_median_min: float = 0.0
     headcount_growth_median_max: float = 3.0
-    headcount_growth_sigma: float = 0.5
-    headcount_growth_accel_default: float = 3.0
+    headcount_growth_sigma: float = 0.2
+    headcount_growth_accel_default: float = 1.0
     headcount_growth_accel_min: float = 0.0
     headcount_growth_accel_max: float = 10.0
-    headcount_slowdown_threshold: int = 15
-    headcount_slowdown_factor: float = 0.75
+    headcount_slowdown_threshold: int = 10
+    headcount_slowdown_factor: float = .8
     
     # Variable costs
     support_customer_initial_default: float = 400.0
@@ -121,36 +121,36 @@ REVENUE_CONFIG = RevenueConfig()
 COST_CONFIG = CostConfig()
 SIMULATION_CONFIG = SimulationConfig()
 
-# Chart styling configuration - Distill Energy brand colors
-# Based on https://info.distill.energy/ design and energy sector color palette
+# Chart styling configuration - Exact colors from reference image
+# Professional financial dashboard palette matching the provided design
 CHART_COLORS = {
-    # Core brand colors - energy-focused palette
-    'primary': '#1B4F72',        # Deep blue - professional and trustworthy
-    'secondary': '#85929E',      # Soft gray - for supporting elements
-    'success': '#27AE60',        # Energy green - positive metrics
-    'warning': '#F39C12',        # Energy amber - caution/warnings
-    'danger': '#E74C3C',         # Alert red - risks/negative metrics
-    'info': '#3498DB',           # Clear blue - informational
+    # Core brand colors - exact match to reference design
+    'primary': '#3B82F6',        # Blue - primary data line
+    'secondary': '#6B7280',      # Gray - supporting elements
+    'success': '#10B981',        # Green - positive metrics
+    'warning': '#F59E0B',        # Amber - caution/warnings
+    'danger': '#EF4444',         # Red - alerts/negative metrics
+    'info': '#8B5CF6',           # Purple - informational content
     
-    # Revenue colors - green spectrum (growth/positive)
-    'revenue': '#229954',        # Strong green - primary revenue
-    'revenue_secondary': '#58D68D',   # Medium green - secondary revenue
-    'revenue_tertiary': '#ABEBC6',    # Light green - tertiary revenue
+    # Revenue colors - professional spectrum
+    'revenue': '#10B981',        # Green - primary revenue
+    'revenue_secondary': '#059669',   # Dark green - secondary revenue
+    'revenue_tertiary': '#34D399',    # Light green - tertiary revenue
     
-    # Cost colors - amber to red spectrum (expenses/caution)
-    'cost': '#DC7633',           # Primary orange-red - main costs
-    'cost_secondary': '#F4D03F',  # Amber - secondary costs
-    'cost_tertiary': '#F8C471',   # Light amber - variable costs
+    # Cost colors - professional warm spectrum
+    'cost': '#EF4444',           # Red - primary costs
+    'cost_secondary': '#F59E0B',  # Amber - secondary costs
+    'cost_tertiary': '#FCD34D',   # Light yellow - tertiary costs
     
     # Special metrics
-    'headcount': '#8E44AD',      # Purple - team growth
-    'earnings': '#1ABC9C',       # Teal - profitability
-    'efficiency': '#16A085'      # Dark teal - productivity metrics
+    'headcount': '#8B5CF6',      # Purple - team growth
+    'earnings': '#3B82F6',       # Blue - profitability
+    'efficiency': '#06B6D4'      # Cyan - productivity metrics
 }
 
 CHART_STYLE = {
-    'median_width': 3,
-    'percentile_width': 2,
-    'percentile_dash': 'dot',
-    'opacity_background': 0.1
+    'median_width': 4,           # Thicker median line for visibility
+    'percentile_width': 2,       # Standard percentile width
+    'percentile_dash': 'dash',   # Dashed lines for percentiles
+    'opacity_background': 0.15   # Slightly more opacity for dark theme
 } 

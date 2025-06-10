@@ -37,7 +37,7 @@ def create_basic_chart(
     color: str = CHART_COLORS['primary']
 ) -> go.Figure:
     """
-    Create a basic line chart with percentiles.
+    Create a basic line chart with percentiles and quarterly x-axis labels.
     
     Args:
         p10: 10th percentile data
@@ -50,10 +50,15 @@ def create_basic_chart(
     Returns:
         Plotly figure object
     """
+    # Generate quarterly labels for x-axis
+    months = len(median)
+    quarterly_labels = generate_quarterly_labels(months)
+    
     fig = go.Figure()
     
     # Add median line
     fig.add_trace(go.Scatter(
+        x=quarterly_labels,
         y=median, 
         mode='lines', 
         name='Median',
@@ -62,6 +67,7 @@ def create_basic_chart(
     
     # Add percentile lines
     fig.add_trace(go.Scatter(
+        x=quarterly_labels,
         y=p10, 
         mode='lines', 
         name='10th Percentile',
@@ -73,6 +79,7 @@ def create_basic_chart(
     ))
     
     fig.add_trace(go.Scatter(
+        x=quarterly_labels,
         y=p90, 
         mode='lines', 
         name='90th Percentile',
@@ -85,15 +92,37 @@ def create_basic_chart(
     
     # Calculate y-axis range using median as upper limit
     max_median = median.max()
-    y_range = [0, max_median * 1.1]  # Add 10% padding above median
+    y_range = [p10.min()*1.1, max_median * 1.1]  # Add 10% padding above median
     
-    # Update layout
+    # Update layout with dark theme
     fig.update_layout(
-        title=title,
-        xaxis_title='Month',
+        title=dict(
+            text=title,
+            font=dict(color='white', size=16)
+        ),
+        xaxis_title='Quarter',
         yaxis_title=yaxis_title,
-        yaxis=dict(range=y_range),
-        hovermode='x unified'
+        hovermode='x unified',
+        # Dark theme styling - exact match to reference
+        plot_bgcolor='#111827',  # Very dark gray background
+        paper_bgcolor='#0F172A',  # Nearly black background
+        font=dict(color='white'),
+        xaxis=dict(
+            gridcolor='#374151',
+            color='white',
+            title_font=dict(color='white'),
+            tickangle=0
+        ),
+        yaxis=dict(
+            gridcolor='#374151',
+            color='white',  
+            title_font=dict(color='white'),
+            range=y_range
+        ),
+        legend=dict(
+            font=dict(color='white'),
+            bgcolor='rgba(15, 23, 42, 0.8)'
+        )
     )
     
     return fig
@@ -351,4 +380,33 @@ def create_export_dataframe(results: List, months: int) -> pd.DataFrame:
         'Median Churn': churn_med.astype(int)
     })
     
-    return export_df 
+    return export_df
+
+
+def generate_quarterly_labels(months: int, start_year: int = 2025, start_quarter: int = 4) -> List[str]:
+    """
+    Generate quarterly labels for x-axis.
+    
+    Args:
+        months: Number of months to generate labels for
+        start_year: Starting year (default 2025)
+        start_quarter: Starting quarter (default Q4)
+        
+    Returns:
+        List of quarterly labels like ['2025Q4', '2026Q1', '2026Q2', ...]
+    """
+    labels = []
+    current_year = start_year
+    current_quarter = start_quarter
+    
+    for month in range(months):
+        labels.append(f"{current_year}Q{current_quarter}")
+        
+        # Move to next quarter every 3 months
+        if (month + 1) % 3 == 0:
+            current_quarter += 1
+            if current_quarter > 4:
+                current_quarter = 1
+                current_year += 1
+    
+    return labels 

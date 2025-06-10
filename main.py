@@ -46,13 +46,48 @@ import numpy as np
 def main():
     """Main application function."""
     
-    # Configure Streamlit page
+    # Configure Streamlit page with dark theme
     st.set_page_config(
         page_title="Distill Financial Model",
         page_icon="🏢",
         layout="wide",
         initial_sidebar_state="expanded"
     )
+    
+    # Inject custom CSS for dark theme
+    st.markdown("""
+    <style>
+    /* Dark theme styling - exact match to reference */
+    .main .block-container {
+        background-color: #0F172A;
+        color: white;
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background-color: #111827;
+    }
+    
+    /* Metric styling */
+    [data-testid="metric-container"] {
+        background-color: #111827;
+        border: 1px solid #374151;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        color: white;
+    }
+    
+    /* Headers */
+    h1, h2, h3 {
+        color: white !important;
+    }
+    
+    /* Text elements */
+    .stMarkdown, .stText {
+        color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     # Display header
     display_app_header()
