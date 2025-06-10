@@ -29,7 +29,7 @@ class RevenueConfig:
     revenue_per_sim_year_default: float = 87.60
     
     # Customer growth
-    customer_delay_default: int = 9
+    customer_delay_default: int = 0
     customer_growth_median_default: float = 0.7
     customer_growth_median_min: float = 0.0
     customer_growth_median_max: float = 3.0
@@ -70,16 +70,16 @@ class CostConfig:
     initial_headcount_default: int = 5
     initial_headcount_min: int = 1
     initial_headcount_max: int = 20
-    headcount_delay_default: int = 6
+    headcount_delay_default: int = 0
     headcount_growth_median_default: float = 1.0
     headcount_growth_median_min: float = 0.0
     headcount_growth_median_max: float = 3.0
-    headcount_growth_sigma: float = 1.0
+    headcount_growth_sigma: float = 0.5
     headcount_growth_accel_default: float = 3.0
     headcount_growth_accel_min: float = 0.0
     headcount_growth_accel_max: float = 10.0
     headcount_slowdown_threshold: int = 15
-    headcount_slowdown_factor: float = 0.5
+    headcount_slowdown_factor: float = 0.75
     
     # Variable costs
     support_customer_initial_default: float = 400.0
@@ -91,6 +91,9 @@ class CostConfig:
     compute_growth_default: float = 100.0
     compute_growth_min: float = 0.0
     compute_growth_max: float = 100.0
+    compute_customer_multiplier_default: float = 0.02
+    compute_customer_multiplier_min: float = 0.0
+    compute_customer_multiplier_max: float = 0.10
 
 
 @dataclass
@@ -102,7 +105,7 @@ class SimulationConfig:
     months_min: int = 12
     months_max: int = 36
     
-    simulations_default: int = 250
+    simulations_default: int = 500
     simulations_min: int = 100
     simulations_max: int = 1000
     
@@ -118,21 +121,31 @@ REVENUE_CONFIG = RevenueConfig()
 COST_CONFIG = CostConfig()
 SIMULATION_CONFIG = SimulationConfig()
 
-# Chart styling configuration
+# Chart styling configuration - Distill Energy brand colors
+# Based on https://info.distill.energy/ design and energy sector color palette
 CHART_COLORS = {
-    'primary': 'blue',
-    'secondary': 'red',
-    'success': 'green',
-    'warning': 'orange',
-    'danger': 'red',
-    'info': 'lightblue',
-    'revenue': 'green',
-    'revenue_secondary': 'darkgreen',
-    'revenue_tertiary': 'lightgreen',
-    'cost': 'red',
-    'cost_secondary': 'darkred',
-    'cost_tertiary': 'orange',
-    'headcount': 'purple'
+    # Core brand colors - energy-focused palette
+    'primary': '#1B4F72',        # Deep blue - professional and trustworthy
+    'secondary': '#85929E',      # Soft gray - for supporting elements
+    'success': '#27AE60',        # Energy green - positive metrics
+    'warning': '#F39C12',        # Energy amber - caution/warnings
+    'danger': '#E74C3C',         # Alert red - risks/negative metrics
+    'info': '#3498DB',           # Clear blue - informational
+    
+    # Revenue colors - green spectrum (growth/positive)
+    'revenue': '#229954',        # Strong green - primary revenue
+    'revenue_secondary': '#58D68D',   # Medium green - secondary revenue
+    'revenue_tertiary': '#ABEBC6',    # Light green - tertiary revenue
+    
+    # Cost colors - amber to red spectrum (expenses/caution)
+    'cost': '#DC7633',           # Primary orange-red - main costs
+    'cost_secondary': '#F4D03F',  # Amber - secondary costs
+    'cost_tertiary': '#F8C471',   # Light amber - variable costs
+    
+    # Special metrics
+    'headcount': '#8E44AD',      # Purple - team growth
+    'earnings': '#1ABC9C',       # Teal - profitability
+    'efficiency': '#16A085'      # Dark teal - productivity metrics
 }
 
 CHART_STYLE = {

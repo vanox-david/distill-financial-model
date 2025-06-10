@@ -46,6 +46,7 @@ class CostParameters(NamedTuple):
     support_growth: float
     compute_initial: float
     compute_growth: float
+    compute_customer_multiplier: float
 
 
 @dataclass
@@ -225,7 +226,12 @@ class CostModel:
             benefits_cost = self.params.benefits_monthly
             
             # Variable costs
-            compute_cost = self.params.compute_initial * (1 + self.params.compute_growth) ** year_factor
+            # Compute cost now depends on number of customers
+            compute_cost = (
+                self.params.compute_initial * 
+                (1 + self.params.compute_growth) ** year_factor *
+                (1 + customers[month] * self.params.compute_customer_multiplier)
+            )
             customer_support_cost = (
                 self.params.support_customer_initial * 
                 (1 + self.params.support_growth) ** year_factor * 

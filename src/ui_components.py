@@ -108,7 +108,8 @@ def create_revenue_controls(months: int) -> RevenueParameters:
         'Monthly Customer Growth Acceleration (%)',
         REVENUE_CONFIG.customer_growth_accel_min,
         REVENUE_CONFIG.customer_growth_accel_max,
-        REVENUE_CONFIG.customer_growth_accel_default
+        REVENUE_CONFIG.customer_growth_accel_default,
+        step=0.1
     ) / 100
     
     # Churn controls
@@ -226,7 +227,8 @@ def create_cost_controls(months: int) -> CostParameters:
         'Monthly Headcount Growth Acceleration (%)',
         COST_CONFIG.headcount_growth_accel_min,
         COST_CONFIG.headcount_growth_accel_max,
-        COST_CONFIG.headcount_growth_accel_default
+        COST_CONFIG.headcount_growth_accel_default,
+        step=0.1
     ) / 100
     
     # Variable costs
@@ -256,6 +258,15 @@ def create_cost_controls(months: int) -> CostParameters:
         COST_CONFIG.compute_growth_default
     ) / 100
     
+    compute_customer_multiplier = st.sidebar.slider(
+        'Compute Cost per Customer (%)',
+        COST_CONFIG.compute_customer_multiplier_min * 100,
+        COST_CONFIG.compute_customer_multiplier_max * 100,
+        COST_CONFIG.compute_customer_multiplier_default * 100,
+        step=0.1,
+        help="Additional compute cost percentage per customer"
+    ) / 100
+    
     return CostParameters(
         hosting_initial=hosting_initial,
         hosting_growth=hosting_growth,
@@ -273,7 +284,8 @@ def create_cost_controls(months: int) -> CostParameters:
         support_customer_initial=support_customer_initial,
         support_growth=support_growth,
         compute_initial=compute_initial,
-        compute_growth=compute_growth
+        compute_growth=compute_growth,
+        compute_customer_multiplier=compute_customer_multiplier
     )
 
 

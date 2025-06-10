@@ -83,11 +83,16 @@ def create_basic_chart(
         )
     ))
     
+    # Calculate y-axis range using median as upper limit
+    max_median = median.max()
+    y_range = [0, max_median * 1.1]  # Add 10% padding above median
+    
     # Update layout
     fig.update_layout(
         title=title,
         xaxis_title='Month',
         yaxis_title=yaxis_title,
+        yaxis=dict(range=y_range),
         hovermode='x unified'
     )
     
@@ -180,9 +185,9 @@ def plot_cost_breakdown_charts(results: List, months: int) -> None:
     plot_metric_chart(software_costs, 'Software Subscription Costs', 'Cost ($)', CHART_COLORS['success'], key='costs_software')
     plot_metric_chart(compute_costs, 'Compute Costs', 'Cost ($)', CHART_COLORS['warning'], key='costs_compute')
     plot_metric_chart(customer_support_costs, 'Customer Support Costs', 'Cost ($)', CHART_COLORS['danger'], key='costs_support')
-    plot_metric_chart(admin_costs, 'Admin & Legal Costs', 'Cost ($)', 'purple', key='costs_admin')
-    plot_metric_chart(conference_costs, 'Conference Costs', 'Cost ($)', 'brown', key='costs_conference')
-    plot_metric_chart(benefits_costs, 'Benefits Costs', 'Cost ($)', 'pink', key='costs_benefits')
+    plot_metric_chart(admin_costs, 'Admin & Legal Costs', 'Cost ($)', CHART_COLORS['headcount'], key='costs_admin')
+    plot_metric_chart(conference_costs, 'Conference Costs', 'Cost ($)', CHART_COLORS['secondary'], key='costs_conference')
+    plot_metric_chart(benefits_costs, 'Benefits Costs', 'Cost ($)', CHART_COLORS['info'], key='costs_benefits')
     
     # Headcount chart
     st.subheader("Team Growth")
@@ -209,8 +214,8 @@ def plot_earnings_charts(results: List, months: int) -> None:
     
     # Main earnings charts
     st.subheader("Earnings Overview")
-    plot_metric_chart(earnings.tolist(), 'Monthly Earnings', 'Earnings ($)', CHART_COLORS['success'], key='earnings_monthly')
-    plot_metric_chart(cumulative_earnings.tolist(), 'Cumulative Earnings', 'Earnings ($)', CHART_COLORS['success'], key='earnings_cumulative')
+    plot_metric_chart(earnings.tolist(), 'Monthly Earnings', 'Earnings ($)', CHART_COLORS['earnings'], key='earnings_monthly')
+    plot_metric_chart(cumulative_earnings.tolist(), 'Cumulative Earnings', 'Earnings ($)', CHART_COLORS['earnings'], key='earnings_cumulative')
     
     # Revenue breakdown in earnings context
     st.subheader("Revenue Breakdown")
@@ -235,8 +240,8 @@ def plot_earnings_charts(results: List, months: int) -> None:
     revenue_per_employee = total_revenue / np.maximum(headcount, 1)
     earnings_per_employee = earnings / np.maximum(headcount, 1)
     
-    plot_metric_chart(revenue_per_employee.tolist(), 'Revenue per Employee', 'Revenue per Employee ($)', CHART_COLORS['info'], key='earnings_revenue_per_employee')
-    plot_metric_chart(earnings_per_employee.tolist(), 'Earnings per Employee', 'Earnings per Employee ($)', CHART_COLORS['success'], key='earnings_per_employee')
+    plot_metric_chart(revenue_per_employee.tolist(), 'Revenue per Employee', 'Revenue per Employee ($)', CHART_COLORS['efficiency'], key='earnings_revenue_per_employee')
+    plot_metric_chart(earnings_per_employee.tolist(), 'Earnings per Employee', 'Earnings per Employee ($)', CHART_COLORS['earnings'], key='earnings_per_employee')
 
 
 def display_summary_metrics(results: List, months: int) -> None:
