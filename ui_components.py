@@ -309,25 +309,13 @@ def create_export_button(results: list, months: int) -> None:
 
 
 def display_app_header() -> None:
-    """Display the main application header and description."""
-    st.title('🏢 Distill Financials Dashboard')
+    """Display the main application header and description. Tufte-inspired: minimal, informative."""
+    st.title('Distill Financial Model')
     
     st.markdown("""
-    ### Comprehensive Financial Modeling with Monte Carlo Simulation
-    
-    This dashboard provides detailed financial projections using Monte Carlo simulation 
-    to model uncertainty in revenue, costs, and business growth. Use the sidebar controls 
-    to adjust model parameters and explore different scenarios.
-    
-    **Key Features:**
-    - 📈 **Revenue Modeling**: Seat-based and usage-based revenue streams
-    - 💰 **Cost Analysis**: Individual cost component tracking with headcount simulation
-    - 📊 **Earnings Projections**: Break-even analysis and per-employee metrics
-    - 🎲 **Monte Carlo Simulation**: Probabilistic forecasting with confidence intervals
-    - 📋 **Excel Export**: Download detailed projections for further analysis
+    Monte Carlo financial projections with revenue, cost, and earnings analysis. 
+    Adjust parameters in the sidebar to explore scenarios.
     """)
-    
-    st.divider()
 
 
 def create_tabs() -> Tuple:
@@ -337,22 +325,16 @@ def create_tabs() -> Tuple:
     Returns:
         Tuple of tab objects
     """
-    return st.tabs(["📈 Revenue", "💰 Costs", "💹 Earnings"])
+    return st.tabs(["Revenue", "Costs", "Earnings"])
 
 
 def display_tab_headers(tab_name: str) -> None:
     """
-    Display header for each tab.
+    Display minimal header for each tab.
+    Following Tufte's principle: let the data speak, minimize decorative elements.
     
     Args:
         tab_name: Name of the current tab
     """
-    headers = {
-        "Revenue": "📈 Revenue Analysis & Projections",
-        "Costs": "💰 Cost Structure & Team Growth",
-        "Earnings": "💹 Earnings, Profitability & Efficiency"
-    }
-    
-    if tab_name in headers:
-        st.header(headers[tab_name])
-        st.markdown("---") 
+    # Simple, descriptive headers without excessive decoration
+    pass  # Let the chart titles and content provide context 

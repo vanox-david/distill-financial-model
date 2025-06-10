@@ -39,118 +39,170 @@ def main():
     # Inject custom CSS for cohesive slate theme matching charts
     st.markdown("""
     <style>
-    /* Cohesive slate theme - consistent with chart backgrounds */
+    /* Cohesive slate theme - Tufte principles: minimal, elegant, data-focused */
     .main .block-container {
         background-color: #0f172a;  /* slate-900 - slightly darker main area */
         color: white;
-        border-radius: 0.75rem;
-        border: 1px solid #334155;  /* slate-600 border */
+        border-radius: 0.375rem;  /* Smaller radius - less "boxy" */
+        border: none;  /* Remove border - Tufte: remove unnecessary ink */
+        padding: 1rem 2rem;  /* Tighter padding */
     }
     
     /* Sidebar styling - matches chart background exactly */
     .css-1d391kg {
         background-color: #1e293b;  /* slate-800 - same as charts */
-        border-right: 2px solid #334155;  /* slate-600 border */
+        border-right: 1px solid rgba(51, 65, 85, 0.3);  /* Much more subtle border */
     }
     
-    /* Sidebar headers and labels */
+    /* Sidebar headers and labels - more refined typography */
     .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3, .css-1d391kg label {
-        color: #f1f5f9 !important;  /* slate-100 */
+        color: #e2e8f0 !important;  /* slate-200 - softer than pure white */
+        font-weight: 500 !important;  /* Medium weight, not bold */
     }
     
-    /* Metric styling - elevated design */
+    /* Metric styling - minimal, elegant (Tufte: let data speak) */
     [data-testid="metric-container"] {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid #475569;  /* slate-600 */
-        padding: 1.25rem;
-        border-radius: 0.75rem;
+        background: rgba(30, 41, 59, 0.3);  /* Very subtle background */
+        border: 1px solid rgba(71, 85, 105, 0.2);  /* Barely visible border */
+        padding: 1rem;  /* More space for breathing */
+        border-radius: 0.5rem;  /* Subtle rounding */
         color: white;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        box-shadow: none;  /* Remove shadow - Tufte: avoid decorative elements */
+        backdrop-filter: blur(10px);  /* Subtle modern effect */
     }
     
-    /* Metric values - enhanced styling */
+    /* Metric values - clean, readable */
     [data-testid="metric-container"] [data-testid="metric-value"] {
         color: #f1f5f9 !important;  /* slate-100 */
-        font-weight: 700 !important;
+        font-weight: 600 !important;  /* Slightly less bold */
+        font-size: 1.5rem !important;  /* Readable but not overwhelming */
     }
     
-    /* Headers - gradient text */
+    /* Metric labels - subtle but readable */
+    [data-testid="metric-container"] [data-testid="metric-label"] {
+        color: #cbd5e1 !important;  /* slate-300 */
+        font-size: 0.875rem !important;
+        font-weight: 400 !important;
+    }
+    
+    /* Headers - clean, minimal (Tufte: reduce visual noise) */
     h1 {
         color: #f8fafc !important;  /* slate-50 */
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 600 !important;  /* Less bold */
+        font-size: 2rem !important;  /* Smaller, more proportional */
+        margin-bottom: 1rem !important;
+        text-shadow: none !important;  /* Remove shadow */
     }
     
-    h2, h3 {
+    h2 {
         color: #e2e8f0 !important;  /* slate-200 */
+        font-weight: 500 !important;
+        font-size: 1.5rem !important;
+        margin: 1.5rem 0 0.75rem 0 !important;
     }
     
-    /* Text elements */
+    h3 {
+        color: #cbd5e1 !important;  /* slate-300 */
+        font-weight: 500 !important;
+        font-size: 1.25rem !important;
+        margin: 1rem 0 0.5rem 0 !important;
+    }
+    
+    /* Text elements - better hierarchy */
     .stMarkdown, .stText {
         color: #cbd5e1 !important;  /* slate-300 */
+        line-height: 1.6 !important;  /* Better readability */
     }
     
-    /* Streamlit app background */
+    /* Streamlit app background - cleaner gradient */
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     }
     
-    /* Tab styling - consistent with sidebar */
+    /* Tab styling - minimal, clean */
     .stTabs [data-baseweb="tab-list"] {
-        background-color: #1e293b;
-        border-radius: 0.5rem;
+        background-color: rgba(30, 41, 59, 0.5);  /* More subtle */
+        border-radius: 0.375rem;
         padding: 0.25rem;
-        border: 1px solid #334155;
+        border: 1px solid rgba(51, 65, 85, 0.3);  /* Subtle border */
+        margin-bottom: 1.5rem;
     }
     
     .stTabs [data-baseweb="tab-list"] button {
         background-color: transparent !important;
         color: #94a3b8 !important;  /* slate-400 */
-        border-radius: 0.375rem !important;
+        border-radius: 0.25rem !important;
+        border: none !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
     }
     
     .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        background-color: #334155 !important;  /* slate-600 */
+        background-color: rgba(51, 65, 85, 0.5) !important;  /* More subtle active state */
         color: #f1f5f9 !important;  /* slate-100 */
     }
     
-    /* Input styling */
+    /* Input styling - clean, minimal */
     .stNumberInput input, .stSlider, .stSelectbox select {
-        background-color: #334155 !important;  /* slate-600 */
+        background-color: rgba(51, 65, 85, 0.3) !important;  /* More subtle */
         color: white !important;
-        border: 1px solid #475569 !important;  /* slate-600 */
-        border-radius: 0.375rem !important;
+        border: 1px solid rgba(71, 85, 105, 0.3) !important;  /* Lighter border */
+        border-radius: 0.25rem !important;
+        transition: border-color 0.2s ease !important;
     }
     
-    /* Dividers */
+    .stNumberInput input:focus, .stSelectbox select:focus {
+        border-color: rgba(59, 130, 246, 0.5) !important;  /* Subtle focus state */
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    }
+    
+    /* Dividers - minimal */
     .stMarkdown hr {
-        border-color: #475569 !important;  /* slate-600 */
+        border: none !important;
+        height: 1px !important;
+        background: linear-gradient(90deg, transparent, rgba(71, 85, 105, 0.3), transparent) !important;
         margin: 2rem 0 !important;
     }
     
-    /* Button styling */
+    /* Button styling - minimal, functional */
     .stButton button {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+        background: rgba(59, 130, 246, 0.8) !important;  /* More subtle */
         color: white !important;
-        border: none !important;
-        border-radius: 0.5rem !important;
-        font-weight: 600 !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 0.375rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
         transition: all 0.2s ease !important;
+        backdrop-filter: blur(10px) !important;
     }
     
     .stButton button:hover {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3) !important;
+        background: rgba(59, 130, 246, 1) !important;
+        border-color: rgba(59, 130, 246, 0.8) !important;
+        transform: none !important;  /* Remove animation - Tufte: avoid unnecessary movement */
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2) !important;
     }
     
-    /* Download button special styling */
+    /* Download button - distinguished but not flashy */
     .stDownloadButton button {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        background: rgba(16, 185, 129, 0.8) !important;
+        border: 1px solid rgba(16, 185, 129, 0.3) !important;
     }
     
     .stDownloadButton button:hover {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3) !important;
+        background: rgba(16, 185, 129, 1) !important;
+        border-color: rgba(16, 185, 129, 0.8) !important;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2) !important;
+    }
+    
+    /* Hide Streamlit elements that add clutter (Tufte: remove non-essential elements) */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Spinner - minimal */
+    .stSpinner > div {
+        border-top-color: rgba(59, 130, 246, 0.8) !important;
     }
     </style>
     """, unsafe_allow_html=True)

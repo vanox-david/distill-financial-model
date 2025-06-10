@@ -38,6 +38,7 @@ def create_basic_chart(
 ) -> go.Figure:
     """
     Create a basic line chart with percentiles and quarterly x-axis labels.
+    Following Edward Tufte's principles: maximize data-ink ratio, minimize chartjunk.
     
     Args:
         p10: 10th percentile data
@@ -61,80 +62,128 @@ def create_basic_chart(
     
     fig = go.Figure()
     
-    # Add median line (using monthly indices for full resolution)
+    # Add confidence band between percentiles (Tufte: show uncertainty elegantly)
+    fig.add_trace(go.Scatter(
+        x=monthly_indices + monthly_indices[::-1],  # Concatenate for fill
+        y=list(p90) + list(p10[::-1]),  # Upper then lower boundary
+        fill='toself',
+        fillcolor=f'rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.08)',  # Very subtle fill
+        line=dict(color='rgba(255,255,255,0)'),  # Invisible border
+        hoverinfo='skip',
+        showlegend=False,
+        name='Confidence Range'
+    ))
+    
+    # Determine formatting based on y-axis title
+    is_currency = '$' in yaxis_title or 'Cost' in yaxis_title or 'Revenue' in yaxis_title or 'Earnings' in yaxis_title
+    is_people = 'People' in yaxis_title or 'Headcount' in yaxis_title or 'Customers' in title
+    
+    # Format hover templates based on data type
+    if is_currency:
+        hover_format = '<b>%{fullData.name}</b><br>Quarter: %{x}<br>Value: $%{y:,.0f}<extra></extra>'
+        tick_format = '$,.0f'
+    elif is_people:
+        hover_format = '<b>%{fullData.name}</b><br>Quarter: %{x}<br>Value: %{y:,.0f}<extra></extra>'
+        tick_format = ',.0f'
+    else:
+        hover_format = '<b>%{fullData.name}</b><br>Quarter: %{x}<br>Value: %{y:,.1f}<extra></extra>'
+        tick_format = ',.1f'
+    
+    # Add median line (primary focus - Tufte: emphasize the most important data)
     fig.add_trace(go.Scatter(
         x=monthly_indices,
         y=median, 
         mode='lines', 
         name='Median',
-        line=dict(color=color, width=CHART_STYLE['median_width'])
+        line=dict(color=color, width=3),  # Slightly thinner, more elegant
+        hovertemplate=hover_format
     ))
     
-    # Add percentile lines (using monthly indices for full resolution)
+    # Add subtle percentile lines (Tufte: minimize secondary information)
     fig.add_trace(go.Scatter(
         x=monthly_indices,
         y=p10, 
         mode='lines', 
-        name='10th Percentile',
+        name='10th %ile',  # Shortened legend text
         line=dict(
-            color=CHART_COLORS['secondary'], 
-            width=CHART_STYLE['percentile_width'],
-            dash=CHART_STYLE['percentile_dash']
-        )
+            color=f'rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.4)',  # Semi-transparent
+            width=1.5,  # Thinner for less emphasis
+            dash='dot'  # More subtle than dashes
+        ),
+        hovertemplate=hover_format
     ))
     
     fig.add_trace(go.Scatter(
         x=monthly_indices,
         y=p90, 
         mode='lines', 
-        name='90th Percentile',
+        name='90th %ile',  # Shortened legend text
         line=dict(
-            color=CHART_COLORS['secondary'], 
-            width=CHART_STYLE['percentile_width'],
-            dash=CHART_STYLE['percentile_dash']
-        )
+            color=f'rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.4)',  # Semi-transparent
+            width=1.5,  # Thinner for less emphasis
+            dash='dot'  # More subtle than dashes
+        ),
+        hovertemplate=hover_format
     ))
     
     # Calculate y-axis range using median as upper limit
     max_median = median.max()
-    y_range = [p10.min()-.1*max_median, max_median * 1.1]  # Add 10% padding above median
+    y_range = [p10.min() * 0.95, max_median * 1.05]  # Tighter margins - Tufte: minimize empty space
     
-    # Update layout with dark theme and quarterly x-axis labels - MUCH LARGER FONTS
+    # Update layout with Tufte principles: minimal, elegant, data-focused
     fig.update_layout(
         title=dict(
             text=title,
-            font=dict(color='white', size=24)  # Much larger title
+            font=dict(color='white', size=18),  # Smaller, less dominant title
+            x=0.02,  # Left-align title (Tufte: avoid center alignment when unnecessary)
+            xanchor='left'
         ),
-        xaxis_title='Quarter',
-        yaxis_title=yaxis_title,
+        # Remove axis titles - let the chart title and context make it clear (Tufte: reduce redundancy)
         hovermode='x unified',
-        # Dark theme styling - exact match to reference
+        # Dark theme styling - minimalist approach
         plot_bgcolor='#1e293b',  # bg-slate-800 background
         paper_bgcolor='#1e293b',  # bg-slate-800 background for entire chart area
-        font=dict(color='white', size=20),  # Much larger base font
+        font=dict(color='white', size=14),  # Smaller, more refined font
+        margin=dict(l=50, r=20, t=50, b=40),  # Tighter margins
         xaxis=dict(
-            gridcolor='#374151',
-            color='white',
-            title_font=dict(color='white', size=22),  # Much larger axis title
-            tickfont=dict(color='white', size=18),    # Much larger tick labels
+            gridcolor='rgba(55, 65, 81, 0.3)',  # Much more subtle grid (Tufte: minimize grid lines)
+            gridwidth=0.5,  # Thinner grid lines
+            color='rgba(203, 213, 225, 0.8)',  # More subtle axis color
+            title_font=dict(color='rgba(203, 213, 225, 0.8)', size=12),  # Smaller axis labels
+            tickfont=dict(color='rgba(203, 213, 225, 0.8)', size=11),  # Smaller ticks
             tickangle=0,
             # Set custom tick positions and labels for quarterly display
             tickmode='array',
             tickvals=quarterly_positions[:len(quarterly_labels_display)],
             ticktext=quarterly_labels_display,
-            range=[-0.5, months - 0.5]  # Show full range with slight padding
+            range=[-0.5, months - 0.5],  # Show full range with slight padding
+            showline=False,  # Remove axis line (Tufte: remove unnecessary ink)
+            zeroline=False,  # Remove zero line
+            minor=dict(showgrid=False)  # Remove minor grid lines
         ),
         yaxis=dict(
-            gridcolor='#374151',
-            color='white',  
-            title_font=dict(color='white', size=22),  # Much larger axis title
-            tickfont=dict(color='white', size=18),    # Much larger tick labels
-            range=y_range
+            gridcolor='rgba(55, 65, 81, 0.2)',  # Even more subtle horizontal grid
+            gridwidth=0.5,  # Thinner grid lines  
+            color='rgba(203, 213, 225, 0.8)',  # More subtle axis color
+            title_font=dict(color='rgba(203, 213, 225, 0.8)', size=12),  # Smaller labels
+            tickfont=dict(color='rgba(203, 213, 225, 0.8)', size=11),  # Smaller ticks
+            range=y_range,
+            showline=False,  # Remove axis line (Tufte: remove unnecessary ink)
+            zeroline=False,  # Remove zero line
+            tickformat=tick_format,  # Format based on data type
+            minor=dict(showgrid=False)  # Remove minor grid lines
         ),
         legend=dict(
-            font=dict(color='white', size=18),  # Much larger legend text
-            bgcolor='rgba(15, 23, 42, 0.8)'
-        )
+            font=dict(color='rgba(203, 213, 225, 0.9)', size=11),  # Smaller, more subtle legend
+            bgcolor='rgba(15, 23, 42, 0.0)',  # Transparent background
+            bordercolor='rgba(255,255,255,0)',  # No border
+            x=0.02,  # Position legend inside plot area (Tufte: integrate, don't separate)
+            y=0.98,
+            xanchor='left',
+            yanchor='top',
+            orientation='h'  # Horizontal legend takes less space
+        ),
+        showlegend=True
     )
     
     return fig
@@ -165,13 +214,12 @@ def plot_metric_chart(
 def plot_revenue_breakdown_charts(results: List, months: int) -> None:
     """
     Plot all revenue breakdown charts.
+    Following Tufte's principles: organize information clearly, minimize clutter.
     
     Args:
         results: List of simulation results
         months: Number of months simulated
     """
-    st.subheader("Revenue Streams")
-    
     # Extract revenue data
     total_revenue = [result.total_revenue for result in results]
     seat_revenue = [result.seat_revenue for result in results]
@@ -179,19 +227,30 @@ def plot_revenue_breakdown_charts(results: List, months: int) -> None:
     customers = [result.customers for result in results]
     churn = [result.churn for result in results]
     
-    # Plot charts
+    # Revenue Analysis - primary focus
+    st.markdown("##### Revenue Streams")  # Smaller, less dominant headers
     plot_metric_chart(total_revenue, 'Total Monthly Revenue', 'Revenue ($)', CHART_COLORS['revenue'], key='revenue_total')
-    plot_metric_chart(seat_revenue, 'Subscription Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='revenue_seat')
-    plot_metric_chart(simulation_revenue, 'Usage Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='revenue_simulation')
     
-    st.subheader("Customer Metrics")
-    plot_metric_chart(customers, 'Total Customers', 'Customers', CHART_COLORS['info'], key='customers_total')
-    plot_metric_chart(churn, 'Monthly Churn', 'Customers Lost', CHART_COLORS['warning'], key='customers_churn')
+    # Show detailed breakdown in a clean grid
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_metric_chart(seat_revenue, 'Subscription Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='revenue_seat')
+    with col2:
+        plot_metric_chart(simulation_revenue, 'Usage Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='revenue_simulation')
+    
+    # Customer metrics - organized clearly
+    st.markdown("##### Customer Metrics")
+    col3, col4 = st.columns(2)
+    with col3:
+        plot_metric_chart(customers, 'Total Customers', 'Customers', CHART_COLORS['customers'], key='customers_total')
+    with col4:
+        plot_metric_chart(churn, 'Monthly Churn', 'Customers Lost', CHART_COLORS['churn'], key='customers_churn')
 
 
 def plot_cost_breakdown_charts(results: List, months: int) -> None:
     """
     Plot all cost breakdown charts.
+    Following Tufte's principles: clear organization, minimal visual clutter.
     
     Args:
         results: List of simulation results
@@ -202,42 +261,62 @@ def plot_cost_breakdown_charts(results: List, months: int) -> None:
     fixed_costs = [result.fixed_costs for result in results]
     variable_costs = [result.variable_costs for result in results]
     
-    # Individual cost components
+    # Salary costs
     salary_costs = [result.salary_costs for result in results]
+    headcount = [result.headcount for result in results]
+    
+    # Infrastructure costs
     hosting_costs = [result.hosting_costs for result in results]
     software_costs = [result.software_costs for result in results]
     compute_costs = [result.compute_costs for result in results]
     customer_support_costs = [result.customer_support_costs for result in results]
+    
+    # Admin costs
     admin_costs = [result.admin_costs for result in results]
     conference_costs = [result.conference_costs for result in results]
-
-    headcount = [result.headcount for result in results]
     
-    # Aggregate cost charts
-    st.subheader("Aggregate Cost Views")
+    # Primary cost overview
+    st.markdown("##### Cost Overview")
     plot_metric_chart(total_costs, 'Total Monthly Costs', 'Cost ($)', CHART_COLORS['cost'], key='costs_total')
-    plot_metric_chart(fixed_costs, 'Fixed Monthly Costs', 'Cost ($)', CHART_COLORS['cost_secondary'], key='costs_fixed')
-    plot_metric_chart(variable_costs, 'Variable Monthly Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'], key='costs_variable')
     
-    # Individual cost component charts
-    st.subheader("Individual Cost Components")
-    plot_metric_chart(salary_costs, 'Salary Costs', 'Cost ($)', CHART_COLORS['primary'], key='costs_salary')
-    plot_metric_chart(hosting_costs, 'Hosting Costs', 'Cost ($)', CHART_COLORS['info'], key='costs_hosting')
-    plot_metric_chart(software_costs, 'Software Subscription Costs', 'Cost ($)', CHART_COLORS['success'], key='costs_software')
-    plot_metric_chart(compute_costs, 'Compute Costs', 'Cost ($)', CHART_COLORS['warning'], key='costs_compute')
-    plot_metric_chart(customer_support_costs, 'Customer Support Costs', 'Cost ($)', CHART_COLORS['danger'], key='costs_support')
-    plot_metric_chart(admin_costs, 'Admin & Legal Costs', 'Cost ($)', CHART_COLORS['headcount'], key='costs_admin')
-    plot_metric_chart(conference_costs, 'Conference Costs', 'Cost ($)', CHART_COLORS['secondary'], key='costs_conference')
-
+    # Cost structure breakdown - organized in logical groups
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_metric_chart(fixed_costs, 'Fixed Costs', 'Cost ($)', CHART_COLORS['cost_secondary'], key='costs_fixed')
+    with col2:
+        plot_metric_chart(variable_costs, 'Variable Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'], key='costs_variable')
     
-    # Headcount chart
-    st.subheader("Team Growth")
-    plot_metric_chart(headcount, 'Headcount Growth', 'Headcount', CHART_COLORS['headcount'], key='costs_headcount')
+    # Personnel costs
+    st.markdown("##### Personnel")
+    col3, col4 = st.columns(2)
+    with col3:
+        plot_metric_chart(salary_costs, 'Salary Costs', 'Cost ($)', CHART_COLORS['salary'], key='costs_salary')
+    with col4:
+        plot_metric_chart(headcount, 'Total Headcount', 'People', CHART_COLORS['headcount'], key='costs_headcount')
+    
+    # Infrastructure costs - clean grid layout
+    st.markdown("##### Infrastructure")
+    col5, col6 = st.columns(2)
+    with col5:
+        plot_metric_chart(hosting_costs, 'Hosting Costs', 'Cost ($)', CHART_COLORS['hosting'], key='costs_hosting')
+        plot_metric_chart(compute_costs, 'Compute Costs', 'Cost ($)', CHART_COLORS['compute'], key='costs_compute')
+    with col6:
+        plot_metric_chart(software_costs, 'Software Subscriptions', 'Cost ($)', CHART_COLORS['software'], key='costs_software')
+        plot_metric_chart(customer_support_costs, 'Customer Support', 'Cost ($)', CHART_COLORS['support'], key='costs_support')
+    
+    # Administrative costs - minimal section
+    st.markdown("##### Administrative")
+    col7, col8 = st.columns(2)
+    with col7:
+        plot_metric_chart(admin_costs, 'Admin & Legal', 'Cost ($)', CHART_COLORS['admin'], key='costs_admin')
+    with col8:
+        plot_metric_chart(conference_costs, 'Conference Fees', 'Cost ($)', CHART_COLORS['conference'], key='costs_conference')
 
 
 def plot_earnings_charts(results: List, months: int) -> None:
     """
     Plot earnings analysis charts.
+    Following Tufte's principles: focus on the most important relationships and insights.
     
     Args:
         results: List of simulation results
@@ -253,36 +332,35 @@ def plot_earnings_charts(results: List, months: int) -> None:
     earnings = total_revenue - total_costs
     cumulative_earnings = np.cumsum(earnings, axis=1)
     
-    # Main earnings charts
-    st.subheader("Earnings Overview")
+    # Primary earnings analysis - most important charts first
+    st.markdown("##### Profitability Analysis")
     plot_metric_chart(earnings.tolist(), 'Monthly Earnings', 'Earnings ($)', CHART_COLORS['earnings'], key='earnings_monthly')
     plot_metric_chart(cumulative_earnings.tolist(), 'Cumulative Earnings', 'Earnings ($)', CHART_COLORS['earnings'], key='earnings_cumulative')
     
-    # Revenue breakdown in earnings context
-    st.subheader("Revenue Breakdown")
-    plot_metric_chart(total_revenue.tolist(), 'Total Revenue', 'Revenue ($)', CHART_COLORS['revenue'], key='earnings_revenue_total')
-    plot_metric_chart(seat_revenue.tolist(), 'Seat-Based Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='earnings_revenue_seat')
-    plot_metric_chart(simulation_revenue.tolist(), 'Simulation-Year Revenue', 'Revenue ($)', CHART_COLORS['revenue_tertiary'], key='earnings_revenue_simulation')
+    # Revenue and cost context - side by side for comparison
+    st.markdown("##### Revenue vs Costs")
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_metric_chart(total_revenue.tolist(), 'Total Revenue', 'Revenue ($)', CHART_COLORS['revenue'], key='earnings_revenue_total')
+        # Revenue breakdown
+        plot_metric_chart(seat_revenue.tolist(), 'Subscription Revenue', 'Revenue ($)', CHART_COLORS['revenue_secondary'], key='earnings_revenue_seat')
+    with col2:
+        plot_metric_chart(total_costs.tolist(), 'Total Costs', 'Cost ($)', CHART_COLORS['cost'], key='earnings_costs_total')
+        # Cost breakdown
+        fixed_costs = np.array([result.fixed_costs for result in results])
+        plot_metric_chart(fixed_costs.tolist(), 'Fixed Costs', 'Cost ($)', CHART_COLORS['cost_secondary'], key='earnings_costs_fixed')
     
-    # Cost breakdown in earnings context
-    st.subheader("Cost Breakdown")
-    fixed_costs = np.array([result.fixed_costs for result in results])
-    variable_costs = np.array([result.variable_costs for result in results])
+    # Efficiency metrics - focus on per-employee productivity
+    st.markdown("##### Team Efficiency")
+    col3, col4 = st.columns(2)
     
-    plot_metric_chart(total_costs.tolist(), 'Total Costs', 'Cost ($)', CHART_COLORS['cost'], key='earnings_costs_total')
-    plot_metric_chart(fixed_costs.tolist(), 'Fixed Costs', 'Cost ($)', CHART_COLORS['cost_secondary'], key='earnings_costs_fixed')
-    plot_metric_chart(variable_costs.tolist(), 'Variable Costs', 'Cost ($)', CHART_COLORS['cost_tertiary'], key='earnings_costs_variable')
+    with col3:
+        plot_metric_chart(headcount.tolist(), 'Total Headcount', 'People', CHART_COLORS['headcount'], key='earnings_headcount')
     
-    # Team and productivity
-    st.subheader("Team and Productivity")
-    plot_metric_chart(headcount.tolist(), 'Headcount Evolution', 'Headcount', CHART_COLORS['headcount'], key='earnings_headcount')
-    
-    # Per-employee metrics (avoid division by zero)
-    revenue_per_employee = total_revenue / np.maximum(headcount, 1)
-    earnings_per_employee = earnings / np.maximum(headcount, 1)
-    
-    plot_metric_chart(revenue_per_employee.tolist(), 'Revenue per Employee', 'Revenue per Employee ($)', CHART_COLORS['efficiency'], key='earnings_revenue_per_employee')
-    plot_metric_chart(earnings_per_employee.tolist(), 'Earnings per Employee', 'Earnings per Employee ($)', CHART_COLORS['earnings'], key='earnings_per_employee')
+    with col4:
+        # Per-employee metrics (avoid division by zero)
+        revenue_per_employee = total_revenue / np.maximum(headcount, 1)
+        plot_metric_chart(revenue_per_employee.tolist(), 'Revenue per Employee', 'Revenue per Employee ($)', CHART_COLORS['efficiency'], key='earnings_revenue_per_employee')
 
 
 def display_summary_metrics(results: List, months: int) -> None:

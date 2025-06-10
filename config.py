@@ -120,31 +120,46 @@ REVENUE_CONFIG = RevenueConfig()
 COST_CONFIG = CostConfig()
 SIMULATION_CONFIG = SimulationConfig()
 
-# Chart styling configuration - Exact colors from reference image
-# Professional financial dashboard palette matching the provided design
+# Chart styling configuration - Semantic colors aligned with data meaning
+# Professional financial dashboard palette with semantic color associations
 CHART_COLORS = {
-    # Core brand colors - exact match to reference design
-    'primary': '#3B82F6',        # Blue - primary data line
+    # Core semantic colors - aligned with financial meaning
+    'primary': '#3B82F6',        # Blue - general primary data
     'secondary': '#6B7280',      # Gray - supporting elements
     'success': '#10B981',        # Green - positive metrics
     'warning': '#F59E0B',        # Amber - caution/warnings
     'danger': '#EF4444',         # Red - alerts/negative metrics
     'info': '#8B5CF6',           # Purple - informational content
     
-    # Revenue colors - professional spectrum
-    'revenue': '#10B981',        # Green - primary revenue
-    'revenue_secondary': '#059669',   # Dark green - secondary revenue
-    'revenue_tertiary': '#34D399',    # Light green - tertiary revenue
+    # Revenue colors - GREEN spectrum (positive financial flow)
+    'revenue': '#10B981',        # Green - total revenue (primary)
+    'revenue_secondary': '#059669',   # Dark green - subscription revenue
+    'revenue_tertiary': '#34D399',    # Light green - usage revenue
     
-    # Cost colors - professional warm spectrum
-    'cost': '#EF4444',           # Red - primary costs
-    'cost_secondary': '#F59E0B',  # Amber - secondary costs
-    'cost_tertiary': '#FCD34D',   # Light yellow - tertiary costs
+    # Cost colors - RED spectrum (negative financial flow)
+    'cost': '#EF4444',           # Red - total costs (primary)
+    'cost_secondary': '#DC2626',  # Dark red - fixed costs
+    'cost_tertiary': '#F87171',   # Light red - variable costs
     
-    # Special metrics
-    'headcount': '#8B5CF6',      # Purple - team growth
+    # Specific cost types - RED variations
+    'hosting': '#EF4444',        # Red - hosting costs
+    'software': '#DC2626',       # Dark red - software costs  
+    'compute': '#F87171',        # Light red - compute costs
+    'support': '#FCA5A5',        # Very light red - support costs
+    'admin': '#B91C1C',          # Very dark red - admin costs
+    'conference': '#7F1D1D',     # Darkest red - conference costs
+    
+    # People/Headcount - PURPLE spectrum
+    'headcount': '#8B5CF6',      # Purple - headcount/team metrics
+    'salary': '#7C3AED',         # Dark purple - salary costs
+    
+    # Performance metrics - BLUE spectrum
     'earnings': '#3B82F6',       # Blue - profitability
-    'efficiency': '#06B6D4'      # Cyan - productivity metrics
+    'efficiency': '#06B6D4',     # Cyan - productivity metrics
+    
+    # Customer metrics - TEAL/CYAN spectrum  
+    'customers': '#14B8A6',      # Teal - customer count
+    'churn': '#F59E0B'           # Amber - churn (warning)
 }
 
 CHART_STYLE = {
