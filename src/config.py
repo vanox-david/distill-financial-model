@@ -15,13 +15,13 @@ class RevenueConfig:
     
     # Seat-based revenue
     seat_fee_default: float = 1000.0
-    avg_seats_default: int = 3
+    avg_seats_default: int = 1
     avg_seats_min: int = 1
     avg_seats_max: int = 10
     
     # Simulation-year revenue
-    sim_year_revenue_mean_default: float = 500.0
-    sim_year_revenue_mean_min: float = 500.0
+    sim_year_revenue_mean_default: float = 250.0
+    sim_year_revenue_mean_min: float = 100.0
     sim_year_revenue_mean_max: float = 15000.0
     sim_year_revenue_sigma_default: float = 1.0
     sim_year_revenue_sigma_min: float = 0.1
@@ -29,7 +29,7 @@ class RevenueConfig:
     revenue_per_sim_year_default: float = 87.60
     
     # Customer growth
-    customer_delay_default: int = 0
+    customer_delay_default: int = 3
     customer_growth_median_default: float = 0.7
     customer_growth_median_min: float = 0.0
     customer_growth_median_max: float = 3.0
@@ -51,12 +51,12 @@ class CostConfig:
     
     # Infrastructure costs
     hosting_initial_default: float = 1500.0
-    hosting_growth_default: float = 5.0
+    hosting_growth_default: float = 15.0
     hosting_growth_min: float = 0.0
     hosting_growth_max: float = 100.0
     
     software_initial_default: float = 2000.0
-    software_growth_default: float = 5.0
+    software_growth_default: float = 15.0
     software_growth_min: float = 0.0
     software_growth_max: float = 100.0
     
@@ -66,7 +66,7 @@ class CostConfig:
     benefits_monthly_default: float = 2000.0
     
     # Headcount costs
-    salary_per_person_default: float = 15000.0
+    salary_per_person_default: float = 18000.0
     initial_headcount_default: int = 5
     initial_headcount_min: int = 1
     initial_headcount_max: int = 20
@@ -91,9 +91,9 @@ class CostConfig:
     compute_growth_default: float = 100.0
     compute_growth_min: float = 0.0
     compute_growth_max: float = 100.0
-    compute_customer_multiplier_default: float = 0.02
-    compute_customer_multiplier_min: float = 0.0
-    compute_customer_multiplier_max: float = 0.10
+    compute_per_sim_year_default: float = 5.0
+    compute_per_sim_year_min: float = 1.0
+    compute_per_sim_year_max: float = 25.0
 
 
 @dataclass

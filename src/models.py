@@ -46,7 +46,7 @@ class CostParameters(NamedTuple):
     support_growth: float
     compute_initial: float
     compute_growth: float
-    compute_customer_multiplier: float
+    compute_per_sim_year: float
 
 
 @dataclass
@@ -90,7 +90,7 @@ class RevenueModel:
         """
         self.params = params
     
-    def simulate_single_run(self, months: int) -> Tuple[List[float], List[float], List[float], List[int], List[int]]:
+    def simulate_single_run(self, months: int) -> Tuple[List[float], List[float], List[float], List[int], List[int], List[float]]:
         """
         Run a single revenue simulation.
         
@@ -98,10 +98,11 @@ class RevenueModel:
             months: Number of months to simulate
             
         Returns:
-            Tuple of (total_revenue, seat_revenue, simulation_revenue, customers, churn)
+            Tuple of (total_revenue, seat_revenue, simulation_revenue, customers, churn, simulation_years)
         """
         revenue, seat_revenue, simulation_revenue = [], [], []
         customers, churn_total = [], []
+        simulation_years_total = []
         
         customer_count = 0
         customer_growth = self.params.customer_growth_median
@@ -145,6 +146,7 @@ class RevenueModel:
                 
                 monthly_simulation_revenue = sim_years_total * self.params.revenue_per_sim_year
             else:
+                sim_years_total = 0
                 monthly_simulation_revenue = 0
             
             # Total revenue
@@ -156,8 +158,9 @@ class RevenueModel:
             simulation_revenue.append(monthly_simulation_revenue)
             customers.append(customer_count)
             churn_total.append(month_churn)
+            simulation_years_total.append(sim_years_total)
         
-        return revenue, seat_revenue, simulation_revenue, customers, churn_total
+        return revenue, seat_revenue, simulation_revenue, customers, churn_total, simulation_years_total
 
 
 class CostModel:
@@ -172,7 +175,7 @@ class CostModel:
         """
         self.params = params
     
-    def simulate_single_run(self, months: int, customers: List[int]) -> Tuple[
+    def simulate_single_run(self, months: int, customers: List[int], simulation_years: List[float]) -> Tuple[
         List[float], List[float], List[float], List[float], List[float],
         List[float], List[float], List[float], List[float], List[float],
         List[float], List[int]
@@ -183,6 +186,7 @@ class CostModel:
         Args:
             months: Number of months to simulate
             customers: Customer count for each month
+            simulation_years: Total simulation-years for each month
             
         Returns:
             Tuple of cost components and headcount
@@ -226,12 +230,10 @@ class CostModel:
             benefits_cost = self.params.benefits_monthly
             
             # Variable costs
-            # Compute cost now depends on number of customers
-            compute_cost = (
-                self.params.compute_initial * 
-                (1 + self.params.compute_growth) ** year_factor *
-                (1 + customers[month] * self.params.compute_customer_multiplier)
-            )
+            # Compute cost now depends on simulation-years
+            base_compute_cost = self.params.compute_initial * (1 + self.params.compute_growth) ** year_factor
+            sim_year_compute_cost = simulation_years[month] * self.params.compute_per_sim_year
+            compute_cost = base_compute_cost + sim_year_compute_cost
             customer_support_cost = (
                 self.params.support_customer_initial * 
                 (1 + self.params.support_growth) ** year_factor * 
@@ -297,13 +299,13 @@ class FinancialModel:
         for _ in range(num_simulations):
             # Run revenue simulation
             (total_revenue, seat_revenue, simulation_revenue, 
-             customers, churn) = self.revenue_model.simulate_single_run(months)
+             customers, churn, simulation_years) = self.revenue_model.simulate_single_run(months)
             
             # Run cost simulation
             (total_costs, fixed_costs, variable_costs, salary_costs,
              hosting_costs, software_costs, admin_costs, conference_costs,
              benefits_costs, compute_costs, customer_support_costs, 
-             headcount) = self.cost_model.simulate_single_run(months, customers)
+             headcount) = self.cost_model.simulate_single_run(months, customers, simulation_years)
             
             # Create result object
             result = SimulationResults(

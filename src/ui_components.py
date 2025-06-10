@@ -258,14 +258,14 @@ def create_cost_controls(months: int) -> CostParameters:
         COST_CONFIG.compute_growth_default
     ) / 100
     
-    compute_customer_multiplier = st.sidebar.slider(
-        'Compute Cost per Customer (%)',
-        COST_CONFIG.compute_customer_multiplier_min * 100,
-        COST_CONFIG.compute_customer_multiplier_max * 100,
-        COST_CONFIG.compute_customer_multiplier_default * 100,
-        step=0.1,
-        help="Additional compute cost percentage per customer"
-    ) / 100
+    compute_per_sim_year = st.sidebar.slider(
+        'Compute Cost per Simulation-Year ($)',
+        COST_CONFIG.compute_per_sim_year_min,
+        COST_CONFIG.compute_per_sim_year_max,
+        COST_CONFIG.compute_per_sim_year_default,
+        step=0.5,
+        help="Cost per simulation-year executed"
+    )
     
     return CostParameters(
         hosting_initial=hosting_initial,
@@ -285,7 +285,7 @@ def create_cost_controls(months: int) -> CostParameters:
         support_growth=support_growth,
         compute_initial=compute_initial,
         compute_growth=compute_growth,
-        compute_customer_multiplier=compute_customer_multiplier
+        compute_per_sim_year=compute_per_sim_year
     )
 
 
