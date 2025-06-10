@@ -189,16 +189,11 @@ def create_cost_controls(months: int) -> CostParameters:
         value=COST_CONFIG.conference_monthly_default
     )
     
-    benefits_monthly = st.sidebar.number_input(
-        'Monthly Benefits ($)',
-        value=COST_CONFIG.benefits_monthly_default
-    )
-    
     # Headcount-based salary parameters
     st.sidebar.subheader("Headcount & Salaries")
     
     salary_per_person = st.sidebar.number_input(
-        'Monthly Salary per Person ($)',
+        'Average monthly fully loaded cost per person ($)',
         value=COST_CONFIG.salary_per_person_default
     )
     
@@ -280,7 +275,6 @@ def create_cost_controls(months: int) -> CostParameters:
         headcount_growth_median=headcount_growth_median,
         headcount_growth_sigma=COST_CONFIG.headcount_growth_sigma,
         headcount_growth_accel=headcount_growth_accel,
-        benefits_monthly=benefits_monthly,
         support_customer_initial=support_customer_initial,
         support_growth=support_growth,
         compute_initial=compute_initial,

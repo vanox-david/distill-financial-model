@@ -63,10 +63,9 @@ class CostConfig:
     # Fixed costs
     admin_monthly_default: float = 15000.0 / 12
     conference_monthly_default: float = 5000.0 / 12
-    benefits_monthly_default: float = 2000.0
     
     # Headcount costs
-    salary_per_person_default: float = 18000.0
+    salary_per_person_default: float = 20000.0
     initial_headcount_default: int = 5
     initial_headcount_min: int = 1
     initial_headcount_max: int = 20

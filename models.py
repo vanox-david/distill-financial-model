@@ -41,7 +41,6 @@ class CostParameters(NamedTuple):
     headcount_growth_median: float
     headcount_growth_sigma: float
     headcount_growth_accel: float
-    benefits_monthly: float
     support_customer_initial: float
     support_growth: float
     compute_initial: float
@@ -70,7 +69,6 @@ class SimulationResults:
     software_costs: List[float]
     admin_costs: List[float]
     conference_costs: List[float]
-    benefits_costs: List[float]
     compute_costs: List[float]
     customer_support_costs: List[float]
     
@@ -178,7 +176,7 @@ class CostModel:
     def simulate_single_run(self, months: int, customers: List[int], simulation_years: List[float]) -> Tuple[
         List[float], List[float], List[float], List[float], List[float],
         List[float], List[float], List[float], List[float], List[float],
-        List[float], List[int]
+        List[int]
     ]:
         """
         Run a single cost simulation.
@@ -193,7 +191,7 @@ class CostModel:
         """
         total_costs, fixed_costs, variable_costs = [], [], []
         salary_costs, hosting_costs, software_costs = [], [], []
-        admin_costs, conference_costs, benefits_costs = [], [], []
+        admin_costs, conference_costs = [], []
         compute_costs, customer_support_costs = [], []
         headcount_results = []
         
@@ -227,7 +225,6 @@ class CostModel:
             admin_cost = self.params.admin_monthly
             conference_cost = self.params.conference_monthly
             salary_cost = headcount * self.params.salary_per_person
-            benefits_cost = self.params.benefits_monthly
             
             # Variable costs
             # Compute cost now depends on simulation-years
@@ -243,7 +240,7 @@ class CostModel:
             # Aggregate costs
             fixed_cost = (
                 hosting_cost + software_cost + admin_cost + 
-                conference_cost + salary_cost + benefits_cost
+                conference_cost + salary_cost
             )
             variable_cost = compute_cost + customer_support_cost
             total_cost = fixed_cost + variable_cost
@@ -257,7 +254,6 @@ class CostModel:
             software_costs.append(software_cost)
             admin_costs.append(admin_cost)
             conference_costs.append(conference_cost)
-            benefits_costs.append(benefits_cost)
             compute_costs.append(compute_cost)
             customer_support_costs.append(customer_support_cost)
             headcount_results.append(headcount)
@@ -265,7 +261,7 @@ class CostModel:
         return (
             total_costs, fixed_costs, variable_costs, salary_costs,
             hosting_costs, software_costs, admin_costs, conference_costs,
-            benefits_costs, compute_costs, customer_support_costs, headcount_results
+            compute_costs, customer_support_costs, headcount_results
         )
 
 
@@ -304,7 +300,7 @@ class FinancialModel:
             # Run cost simulation
             (total_costs, fixed_costs, variable_costs, salary_costs,
              hosting_costs, software_costs, admin_costs, conference_costs,
-             benefits_costs, compute_costs, customer_support_costs, 
+             compute_costs, customer_support_costs, 
              headcount) = self.cost_model.simulate_single_run(months, customers, simulation_years)
             
             # Create result object
@@ -322,7 +318,6 @@ class FinancialModel:
                 software_costs=software_costs,
                 admin_costs=admin_costs,
                 conference_costs=conference_costs,
-                benefits_costs=benefits_costs,
                 compute_costs=compute_costs,
                 customer_support_costs=customer_support_costs,
                 headcount=headcount

@@ -210,7 +210,7 @@ def plot_cost_breakdown_charts(results: List, months: int) -> None:
     customer_support_costs = [result.customer_support_costs for result in results]
     admin_costs = [result.admin_costs for result in results]
     conference_costs = [result.conference_costs for result in results]
-    benefits_costs = [result.benefits_costs for result in results]
+
     headcount = [result.headcount for result in results]
     
     # Aggregate cost charts
@@ -228,7 +228,7 @@ def plot_cost_breakdown_charts(results: List, months: int) -> None:
     plot_metric_chart(customer_support_costs, 'Customer Support Costs', 'Cost ($)', CHART_COLORS['danger'], key='costs_support')
     plot_metric_chart(admin_costs, 'Admin & Legal Costs', 'Cost ($)', CHART_COLORS['headcount'], key='costs_admin')
     plot_metric_chart(conference_costs, 'Conference Costs', 'Cost ($)', CHART_COLORS['secondary'], key='costs_conference')
-    plot_metric_chart(benefits_costs, 'Benefits Costs', 'Cost ($)', CHART_COLORS['info'], key='costs_benefits')
+
     
     # Headcount chart
     st.subheader("Team Growth")
