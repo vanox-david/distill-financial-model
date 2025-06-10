@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 from typing import List, Tuple, Optional
 
-from .config import CHART_COLORS, CHART_STYLE, SIMULATION_CONFIG
+from config import CHART_COLORS, CHART_STYLE, SIMULATION_CONFIG
 
 
 def get_quantiles(data: List[List[float]]) -> Tuple[pd.Series, pd.Series, pd.Series]:

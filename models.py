@@ -9,7 +9,7 @@ import numpy as np
 from typing import List, Tuple, Dict, NamedTuple
 from dataclasses import dataclass
 
-from .config import REVENUE_CONFIG, COST_CONFIG, SIMULATION_CONFIG
+from config import REVENUE_CONFIG, COST_CONFIG, SIMULATION_CONFIG
 
 
 class RevenueParameters(NamedTuple):

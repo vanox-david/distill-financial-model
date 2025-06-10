@@ -10,8 +10,8 @@ import io
 import pandas as pd
 from typing import Tuple
 
-from .config import REVENUE_CONFIG, COST_CONFIG, SIMULATION_CONFIG
-from .models import RevenueParameters, CostParameters
+from config import REVENUE_CONFIG, COST_CONFIG, SIMULATION_CONFIG
+from models import RevenueParameters, CostParameters
 
 
 def create_simulation_controls() -> Tuple[int, int]:
